@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AEGIS — AI Emergency Response & Disaster Management Platform</title>
+
+  <!-- Google Fonts & CDN Libraries -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+  <!-- App CSS Files -->
+  <link rel="stylesheet" href="css/index.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/map.css">
+  <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+
+  <div id="app">
+
+    <!-- ===== SIDEBAR ===== -->
+    <aside id="sidebar">
+      <div class="sidebar-logo">
+        <div class="logo-icon">🚨</div>
+        <div class="logo-text">
+          <div class="logo-name">AEGIS</div>
+          <div class="logo-sub">AI Guardian System</div>
+        </div>
+      </div>
+
+      <div class="live-indicator">
+        <span class="live-dot"></span>
+        <span>SYSTEM OPERATIONAL</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section">
+          <div class="nav-section-title">Command Views</div>
+          <div class="nav-item active" data-view="dashboard">
+            <span class="nav-icon">📊</span>
+            <span>Dashboard</span>
+          </div>
+          <div class="nav-item" data-view="map">
+            <span class="nav-icon">🗺️</span>
+            <span>GIS Map Command</span>
+            <span class="nav-badge" id="alert-badge"></span>
+          </div>
+          <div class="nav-item" data-view="resources">
+            <span class="nav-icon">📦</span>
+            <span>Resource Fleet</span>
+          </div>
+          <div class="nav-item" data-view="comms">
+            <span class="nav-icon">📡</span>
+            <span>Comms & Dispatch</span>
+          </div>
+        </div>
+
+        <div class="nav-section">
+          <div class="nav-section-title">Analytics & Intelligence</div>
+          <div class="nav-item" data-view="analytics">
+            <span class="nav-icon">📈</span>
+            <span>Predictive Analytics</span>
+          </div>
+          <div class="nav-item" data-view="ai">
+            <span class="nav-icon">🧠</span>
+            <span>AI Algorithmic Engine</span>
+          </div>
+        </div>
+      </nav>
+
+      <div class="sidebar-threat">
+        <div class="threat-label">Global Threat Index</div>
+        <div class="threat-gauge">
+          <div class="threat-fill" id="sidebar-threat-fill" style="width: 75%;"></div>
+        </div>
+        <div class="threat-value" id="kpi-overall-threat">75%</div>
+        <div class="threat-type" id="kpi-top-threat-type">Hurricane</div>
+      </div>
+
+      <div class="sidebar-clock">
+        <div id="clock-time">00:00:00</div>
+        <div class="sidebar-date" id="clock-date">Aug 07, 2026</div>
+      </div>
+    </aside>
+
+    <!-- ===== MAIN CONTENT AREA ===== -->
+    <main id="main">
+
+      <!-- TOPBAR -->
+      <header id="topbar">
+        <div class="topbar-title">
+          AEGIS Command Center — <span>Emergency Operations</span>
+        </div>
+
+        <div class="alert-ticker">
+          <span style="font-size: 14px;">⚠️</span>
+          <span id="ticker-text">CAT 4 Hurricane Landfall Warning Active</span>
+        </div>
+
+        <div class="topbar-actions">
+          <select id="scenario-select" class="scenario-select">
+            <option value="HURRICANE">🌀 Cat 4 Hurricane (Chennai)</option>
+            <option value="EARTHQUAKE">🌋 M7.2 Earthquake (Uttarakhand)</option>
+            <option value="WILDFIRE">🔥 Multi-Front Wildfire (Nilgiris)</option>
+            <option value="FLOOD">🌊 Flash Flood (Assam Valley)</option>
+            <option value="CHEMICAL">☣️ Chemical Leak (Jamnagar)</option>
+          </select>
+
+          <button class="btn btn-primary" onclick="window.DP.App.switchView('map')">
+            <span>🗺️ GIS Map</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- CONTENT VIEWS -->
+      <div id="content">
+
+        <!-- 1. DASHBOARD VIEW -->
+        <div id="dashboard-view" class="view-container" style="display: flex;">
+
+          <!-- KPI ROW -->
+          <div class="kpi-row">
+            <div class="kpi-card" style="--kpi-color: var(--critical);">
+              <div class="kpi-icon">🚨</div>
+              <div class="kpi-value" id="kpi-active-incidents">0</div>
+              <div class="kpi-label">Active Incidents</div>
+              <div class="kpi-trend up">▲ 2 new</div>
+            </div>
+
+            <div class="kpi-card" style="--kpi-color: var(--high);">
+              <div class="kpi-icon">👥</div>
+              <div class="kpi-value" id="kpi-affected-pop">0</div>
+              <div class="kpi-label">Population Affected</div>
+              <div class="kpi-trend up">▲ In risk zones</div>
+            </div>
+
+            <div class="kpi-card" style="--kpi-color: var(--low);">
+              <div class="kpi-icon">🚑</div>
+              <div class="kpi-value" id="kpi-deployed-resources">0</div>
+              <div class="kpi-label">Deployed Resources</div>
+              <div class="kpi-trend down">▼ Active fleet</div>
+            </div>
+
+            <div class="kpi-card" style="--kpi-color: var(--accent-primary);">
+              <div class="kpi-icon">🛣️</div>
+              <div class="kpi-value">A* Active</div>
+              <div class="kpi-label">Evacuation Corridors</div>
+              <div class="kpi-trend down">● Clear paths</div>
+            </div>
+
+            <div class="kpi-card" style="--kpi-color: var(--accent-secondary);">
+              <div class="kpi-icon">⛺</div>
+              <div class="kpi-value">K-Means</div>
+              <div class="kpi-label">Staging Hubs</div>
+              <div class="kpi-trend down">● Centroid optimized</div>
+            </div>
+          </div>
+
+          <!-- MIDDLE ROW -->
+          <div class="dashboard-middle">
+
+            <!-- Incidents Panel -->
+            <div class="panel" id="incident-panel">
+              <div class="panel-header">
+                <div class="panel-title">
+                  <span class="icon">🔥</span> Live Incident Command Queue
+                </div>
+              </div>
+              <div class="panel-body" id="incident-list-container">
+                <!-- Rendered dynamically -->
+              </div>
+            </div>
+
+            <!-- Threat Panel -->
+            <div class="panel" id="threat-panel">
+              <div class="panel-header">
+                <div class="panel-title">
+                  <span class="icon">🧠</span> Bayesian Assessment
+                </div>
+              </div>
+              <div class="panel-body">
+                <div class="threat-ring-container">
+                  <div class="threat-ring-wrap">
+                    <svg width="130" height="130" viewBox="0 0 130 130">
+                      <circle class="threat-ring-bg" cx="65" cy="65" r="55" />
+                      <circle class="threat-ring-fill" id="threat-ring-fill" cx="65" cy="65" r="55" />
+                    </svg>
+                    <div class="threat-ring-label">
+                      <div class="threat-ring-pct" id="threat-ring-pct">0%</div>
+                      <div class="threat-ring-text">THREAT SCORE</div>
+                    </div>
+                  </div>
+                  <div class="threat-level-badge badge-high" id="threat-level-badge">HIGH</div>
+                </div>
+
+                <div class="threat-breakdown">
+                  <div class="threat-breakdown-title">Multi-Hazard Probabilities</div>
+                  <div id="threat-breakdown-container">
+                    <!-- Rendered dynamically -->
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- BOTTOM ROW -->
+          <div class="dashboard-bottom">
+
+            <div class="panel">
+              <div class="panel-header">
+                <div class="panel-title"><span class="icon">💡</span> AI Neural Insights</div>
+              </div>
+              <div class="panel-body" id="ai-insights-container">
+                <!-- Rendered dynamically -->
+              </div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-header">
+                <div class="panel-title"><span class="icon">🌡️</span> Sensor Telemetry</div>
+              </div>
+              <div class="panel-body" id="weather-grid-container">
+                <!-- Rendered dynamically -->
+              </div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-header">
+                <div class="panel-title"><span class="icon">📊</span> Severity Distribution</div>
+              </div>
+              <div class="panel-body">
+                <canvas id="chart-severity-distribution"></canvas>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- 2. GIS MAP VIEW -->
+        <div id="map-view" class="view-container" style="display: none;">
+          <div id="map"></div>
+
+          <div class="map-controls">
+            <div class="map-control-group">
+              <button class="map-ctrl-btn active" onclick="window.DP.App.ui.map.toggleLayer('incidents')">
+                <span class="map-ctrl-icon">🚨</span> Incidents Layer
+              </button>
+              <button class="map-ctrl-btn active" onclick="window.DP.App.ui.map.toggleLayer('resources')">
+                <span class="map-ctrl-icon">🚑</span> Resources Fleet
+              </button>
+              <button class="map-ctrl-btn active" onclick="window.DP.App.ui.map.toggleLayer('routes')">
+                <span class="map-ctrl-icon">🛣️</span> A* Evacuation Corridors
+              </button>
+              <button class="map-ctrl-btn active" onclick="window.DP.App.ui.map.toggleLayer('hazards')">
+                <span class="map-ctrl-icon">☣️</span> Danger Zones
+              </button>
+              <button class="map-ctrl-btn active" onclick="window.DP.App.ui.map.toggleLayer('staging')">
+                <span class="map-ctrl-icon">⛺</span> K-Means Staging Hubs
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. RESOURCES VIEW -->
+        <div id="resources-view" class="view-container" style="display: none;">
+          <!-- Rendered dynamically -->
+        </div>
+
+        <!-- 4. COMMS VIEW -->
+        <div id="comms-view" class="view-container" style="display: none;">
+          <!-- Rendered dynamically -->
+        </div>
+
+        <!-- 5. ANALYTICS VIEW -->
+        <div id="analytics-view" class="view-container" style="display: none;">
+          <div class="charts-grid">
+            <div class="chart-card">
+              <div class="chart-card-title">📈 24h Incident Trajectory</div>
+              <canvas id="chart-incident-trend"></canvas>
+            </div>
+
+            <div class="chart-card">
+              <div class="chart-card-title">📦 Resource Deployment Breakdown</div>
+              <canvas id="chart-resource-allocation"></canvas>
+            </div>
+
+            <div class="chart-card">
+              <div class="chart-card-title">🎯 Multi-Hazard Threat Radar</div>
+              <canvas id="chart-threat-radar"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6. AI ENGINE VIEW -->
+        <div id="ai-view" class="view-container" style="display: none;">
+          <div class="ai-grid">
+            
+            <div class="ai-card">
+              <div class="ai-card-header">
+                <span class="ai-card-title">🧠 Bayesian Threat Inference Network</span>
+                <span class="ai-card-algo">P(Disaster|Evidence)</span>
+              </div>
+              <div class="ai-card-body">
+                <div class="metric-row">
+                  <span class="metric-label">Algorithm</span>
+                  <span class="metric-value">Recursive Bayes Network</span>
+                </div>
+                <div class="metric-row">
+                  <span class="metric-label">Update Interval</span>
+                  <span class="metric-value">2500 ms</span>
+                </div>
+                <div class="metric-row">
+                  <span class="metric-label">Evidence Variables</span>
+                  <span class="metric-value">Wind, Rain, Seismic, Temp, Humidity</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="ai-card">
+              <div class="ai-card-header">
+                <span class="ai-card-title">🛣️ A* Pathfinding Evacuation Router</span>
+                <span class="ai-card-algo">f(n) = g(n) + h(n)</span>
+              </div>
+              <div class="ai-card-body">
+                <div class="metric-row">
+                  <span class="metric-label">Grid Resolution</span>
+                  <span class="metric-value">50 x 50 Cells</span>
+                </div>
+                <div class="metric-row">
+                  <span class="metric-label">Dynamic Hazard Penalty</span>
+                  <span class="metric-value">W(e) = Dist * (1 + 1000 * Risk)</span>
+                </div>
+                <div class="metric-row">
+                  <span class="metric-label">Path Smoothing</span>
+                  <span class="metric-value">Euclidean Distance Heuristic</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="ai-card">
+              <div class="ai-card-header">
+                <span class="ai-card-title">⛺ K-Means++ Resource Clustering</span>
+                <span class="ai-card-algo">Min WCSS (Haversine)</span>
+              </div>
+              <div class="ai-card-body">
+                <div class="metric-row">
+                  <span class="metric-label">Centroid Optimization</span>
+                  <span class="metric-value">K-Means++ Initialization</span>
+                </div>
+                <div class="metric-row">
+                  <span class="metric-label">Optimal K Selection</span>
+                  <span class="metric-value">Elbow Method Detection</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="ai-card">
+              <div class="ai-card-header">
+                <span class="ai-card-title">📈 Monte Carlo Risk Simulator</span>
+                <span class="ai-card-algo">1000 Stochastic Iterations</span>
+              </div>
+              <div class="ai-card-body">
+                <div class="metric-row">
+                  <span class="metric-label">Spread Engine</span>
+                  <span class="metric-value">Cellular Automata + Gaussian Noise</span>
+                </div>
+                <div class="metric-row">
+                  <span class="metric-label">Simulated Models</span>
+                  <span class="metric-value">Wildfire, Flood Inundation, Shaking</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+    <!-- ALERT TOAST CONTAINER -->
+    <div id="alert-container"></div>
+
+    <!-- CRITICAL ALERT MODAL -->
+    <div id="critical-modal">
+      <div class="critical-modal-card">
+        <div class="critical-modal-icon">🚨</div>
+        <div class="critical-modal-title">CRITICAL EMERGENCY</div>
+        <div class="critical-modal-body">Category 5 Severe Alert triggered. Immediate evacuation and response required.</div>
+        <div class="critical-modal-actions">
+          <button class="btn btn-danger" onclick="window.DP.App.alerts.closeCriticalModal()">Acknowledge & Dismiss</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- CDN JS Libraries -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Application Utilities & Constants -->
+  <script src="js/utils/constants.js"></script>
+  <script src="js/utils/helpers.js"></script>
+
+  <!-- AI Algorithms -->
+  <script src="js/ai/bayesian.js"></script>
+  <script src="js/ai/astar.js"></script>
+  <script src="js/ai/kmeans.js"></script>
+  <script src="js/ai/decision-tree.js"></script>
+  <script src="js/ai/monte-carlo.js"></script>
+
+  <!-- Data Simulator & Scenarios -->
+  <script src="js/data/scenarios.js"></script>
+  <script src="js/data/simulator.js"></script>
+
+  <!-- UI Components -->
+  <script src="js/components/alerts.js"></script>
+  <script src="js/components/dashboard.js"></script>
+  <script src="js/components/map-manager.js"></script>
+  <script src="js/components/resources.js"></script>
+  <script src="js/components/comms.js"></script>
+  <script src="js/components/charts.js"></script>
+
+  <!-- Main App Controller -->
+  <script src="js/app.js"></script>
+
+</body>
+</html>

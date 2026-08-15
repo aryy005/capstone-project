@@ -1,0 +1,13 @@
+# Operating System Files
+.DS_Store
+Thumbs.db
+
+# Editor Files
+.vscode/
+.idea/
+*.swp
+
+# Node / Scratch
+node_modules/
+npm-debug.log
+*.tmp
