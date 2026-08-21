@@ -120,5 +120,45 @@ window.DP.Helpers = {
       [a[i], a[j]] = [a[j], a[i]];
     }
     return a;
+  },
+
+  // Export NDRF CAP v1.2 Standard Alert JSON
+  exportNDRFCAPReport(scenario, incident) {
+    const activeScen = scenario || window.DP.App?.selectedScenario || { name: 'Emergency Operation' };
+    const inc = incident || window.DP.App?.simulator?.incidents?.[0] || { id: 'INC_001', title: 'Primary Emergency' };
+
+    const capPayload = {
+      "$schema": "OASIS Common Alerting Protocol v1.2 (CAP-IN NDRF Spec)",
+      "identifier": `NDRF-IN-${Date.now()}`,
+      "sender": "AEGIS.AI.DISASTER.PLATFORM",
+      "sent": new Date().toISOString(),
+      "status": "Actual",
+      "msgType": "Alert",
+      "scope": "Public",
+      "info": {
+        "category": "Safety",
+        "event": inc.title || activeScen.name,
+        "urgency": inc.severity >= 4 ? "Immediate" : "Expected",
+        "severity": inc.severity >= 5 ? "Extreme" : (inc.severity >= 4 ? "Severe" : "Moderate"),
+        "certainty": "Observed",
+        "eventCode": { "valueName": "NDRF_CODE", "value": inc.type?.toUpperCase() || "DISASTER" },
+        "expires": new Date(Date.now() + 86400000).toISOString(),
+        "headline": `NDRF Priority Alert: ${inc.title || activeScen.name}`,
+        "description": `AI Emergency Operations Command dispatch for ${activeScen.name}. Population affected: ${(inc.populationAffected || 10000).toLocaleString()}. Responders assigned: ${inc.responders || 5}.`,
+        "instruction": "NDRF battalion units report to pre-positioned A* evacuation corridors immediately.",
+        "area": {
+          "areaDesc": activeScen.name,
+          "circle": `${inc.lat || activeScen.center?.[0] || 20.5},${inc.lng || activeScen.center?.[1] || 78.9},5000`
+        }
+      }
+    };
+
+    const blob = new Blob([JSON.stringify(capPayload, null, 2)], { type: 'application/json' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = `NDRF_CAP_ALERT_${Date.now()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
   }
 };

@@ -7,7 +7,8 @@ class Application {
       astar:        new window.DP.AStarRouter(50),
       kmeans:       new window.DP.KMeansClusterer(),
       decisionTree: new window.DP.SeverityClassifier(),
-      monteCarlo:   new window.DP.MonteCarloPredictor(500)
+      monteCarlo:   new window.DP.MonteCarloPredictor(500),
+      neuralNet:    new window.DP.NeuralDamagePredictor()
     };
 
     this.simulator = new window.DP.DataSimulator();
@@ -170,6 +171,12 @@ class Application {
     } else {
       // For hurricane / chemical — use wildfire spread as proxy
       this.ai.monteCarlo.run('wildfire', mcParams, mcCenter, mcBounds);
+    }
+
+    // 6. Neural Network — Feed-forward damage & casualty prediction
+    if (this.simulator.incidents.length > 0) {
+      const topIncident = this.simulator.incidents[0];
+      this.ai.neuralNet.predict(topIncident, this.simulator.weatherData);
     }
   }
 

@@ -69,6 +69,35 @@ window.DP.DataSimulator = class {
     this.weatherData = { ...scenario.weatherParams };
     this._generateInitialComms(scenario);
     this.emit('scenarioLoaded', { scenario, incidents: this.incidents, resources: this.resources });
+
+    // Fetch real live weather from Open-Meteo API for scenario coordinates
+    if (scenario.center) {
+      this.fetchLiveWeather(scenario.center[0], scenario.center[1]);
+    }
+  }
+
+  async fetchLiveWeather(lat, lng) {
+    try {
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,relative_humidity_2m,rain,wind_speed_10m`;
+      const res = await fetch(url);
+      if (!res.ok) return;
+      const data = await res.json();
+      const current = data.current;
+      if (current) {
+        this.weatherData = {
+          windSpeed:        window.DP.Helpers.clamp((current.wind_speed_10m || 20) / 100, 0.1, 1),
+          rainfall:         window.DP.Helpers.clamp((current.rain || 10) / 100, 0.1, 1),
+          seismicActivity:  this.weatherData.seismicActivity || 0.1,
+          temperature:      window.DP.Helpers.clamp((current.temperature_2m || 25) / 50, 0.1, 1),
+          humidity:         window.DP.Helpers.clamp((current.relative_humidity_2m || 70) / 100, 0.1, 1),
+          incidentReports:  this.weatherData.incidentReports || 0.5,
+          isLiveAPI: true
+        };
+        this.emit('weatherUpdated', this.weatherData);
+      }
+    } catch (e) {
+      console.warn('Live Weather API fallback to simulated telemetry:', e.message);
+    }
   }
 
   _generateResources(counts, center) {
