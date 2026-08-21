@@ -54,7 +54,7 @@ class Application {
   }
 
   initTheme() {
-    const savedTheme = localStorage.getItem('aegis-theme') || 'dark';
+    const savedTheme = localStorage.getItem('aegis-theme') || 'light';
     this.setTheme(savedTheme);
   }
 
@@ -64,15 +64,8 @@ class Application {
     localStorage.setItem('aegis-theme', theme);
 
     const iconEl = document.getElementById('theme-toggle-icon');
-    const textEl = document.getElementById('theme-toggle-text');
-    if (iconEl && textEl) {
-      if (theme === 'light') {
-        iconEl.textContent = '🌙';
-        textEl.textContent = 'Dark Mode';
-      } else {
-        iconEl.textContent = '☀️';
-        textEl.textContent = 'Light Mode';
-      }
+    if (iconEl) {
+      iconEl.textContent = theme === 'light' ? '🌙' : '☀️';
     }
 
     if (this.ui.map) this.ui.map.setThemeTile(theme);

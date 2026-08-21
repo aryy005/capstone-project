@@ -253,8 +253,8 @@ window.DP.ChartManager = class {
 
   setTheme(theme) {
     const isLight = theme === 'light';
-    const textColor = isLight ? '#374151' : '#8892aa';
-    const gridColor = isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.05)';
+    const textColor = isLight ? '#334155' : '#8892aa';
+    const gridColor = isLight ? '#e2e8f0' : 'rgba(255,255,255,0.05)';
 
     Object.values(this.charts).forEach(chart => {
       if (!chart || !chart.options) return;

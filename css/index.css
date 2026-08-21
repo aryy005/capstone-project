@@ -228,9 +228,9 @@ body {
   padding: 0 var(--sp-lg); gap: var(--sp-lg);
   z-index: 50;
 }
-.topbar-title { font-size: 14px; font-weight: 700; flex: 1; color: var(--text-primary); }
+.topbar-title { font-size: 13px; font-weight: 700; color: var(--text-primary); white-space: nowrap; flex-shrink: 0; }
 .topbar-title span { color: var(--text-accent); }
-.topbar-actions { display: flex; gap: var(--sp-sm); align-items: center; }
+.topbar-actions { display: flex; gap: var(--sp-sm); align-items: center; margin-left: auto; }
 
 /* Scenario selector */
 .scenario-select {

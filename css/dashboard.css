@@ -173,3 +173,40 @@
 .weather-item-label { font-size: 9px; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
 .weather-item-value { font-size: 16px; font-weight: 700; margin-top: 2px; color: var(--text-primary); font-family: var(--font-mono); }
 .weather-item-bar { margin-top: 6px; }
+
+/* ===== LIGHT MODE COMPONENT HARMONIZATION ===== */
+[data-theme="light"] .kpi-card {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+[data-theme="light"] .panel {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
+}
+[data-theme="light"] .panel-header {
+  border-bottom-color: #e2e8f0;
+}
+[data-theme="light"] .incident-item {
+  border-bottom-color: #e2e8f0;
+}
+[data-theme="light"] .incident-item:hover {
+  background: #f1f5f9;
+}
+[data-theme="light"] .threat-ring-bg {
+  stroke: #e2e8f0;
+}
+[data-theme="light"] .ai-insight {
+  background: #f0f9ff;
+  border-color: #bae6fd;
+}
+[data-theme="light"] .weather-item {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+}
+[data-theme="light"] .chart-card {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
