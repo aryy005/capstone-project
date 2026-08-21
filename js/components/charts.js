@@ -251,6 +251,29 @@ window.DP.ChartManager = class {
     });
   }
 
+  setTheme(theme) {
+    const isLight = theme === 'light';
+    const textColor = isLight ? '#374151' : '#8892aa';
+    const gridColor = isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.05)';
+
+    Object.values(this.charts).forEach(chart => {
+      if (!chart || !chart.options) return;
+      if (chart.options.plugins?.legend?.labels) {
+        chart.options.plugins.legend.labels.color = textColor;
+      }
+      if (chart.options.scales) {
+        Object.values(chart.options.scales).forEach(scale => {
+          if (scale.ticks) scale.ticks.color = textColor;
+          if (scale.grid) scale.grid.color = gridColor;
+          if (scale.angleLines) scale.angleLines.color = gridColor;
+          if (scale.pointLabels) scale.pointLabels.color = textColor;
+          if (scale.title) scale.title.color = textColor;
+        });
+      }
+      chart.update();
+    });
+  }
+
   update(data) {
     const { simulator, ai } = data;
     if (!this.charts.incidentTrend) this.init();

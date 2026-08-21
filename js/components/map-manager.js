@@ -41,7 +41,27 @@ window.DP.MapManager = class {
       zoomControl: true
     });
 
-    L.tileLayer(window.DP.CONSTANTS.MAP.TILE_URL, {
+    const theme = document.body.getAttribute('data-theme') || 'dark';
+    const tileUrl = theme === 'light'
+      ? 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png'
+      : window.DP.CONSTANTS.MAP.TILE_URL;
+
+    this.tileLayer = L.tileLayer(tileUrl, {
+      attribution: window.DP.CONSTANTS.MAP.TILE_ATTRIBUTION,
+      maxZoom:     window.DP.CONSTANTS.MAP.MAX_ZOOM
+    }).addTo(this.map);
+  }
+
+  setThemeTile(theme) {
+    if (!this.map) return;
+    if (this.tileLayer) {
+      this.map.removeLayer(this.tileLayer);
+    }
+    const tileUrl = theme === 'light'
+      ? 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png'
+      : window.DP.CONSTANTS.MAP.TILE_URL;
+
+    this.tileLayer = L.tileLayer(tileUrl, {
       attribution: window.DP.CONSTANTS.MAP.TILE_ATTRIBUTION,
       maxZoom:     window.DP.CONSTANTS.MAP.MAX_ZOOM
     }).addTo(this.map);

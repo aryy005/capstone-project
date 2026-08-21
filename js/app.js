@@ -42,11 +42,45 @@ class Application {
     // Load Default Scenario
     this.loadScenario('HURRICANE');
 
+    // Initialize Theme
+    this.initTheme();
+
     // Start Simulation Loop
     this.simulator.start(2500);
 
     // Clock
     this.startClock();
+  }
+
+  initTheme() {
+    const savedTheme = localStorage.getItem('aegis-theme') || 'dark';
+    this.setTheme(savedTheme);
+  }
+
+  setTheme(theme) {
+    this.currentTheme = theme;
+    document.body.setAttribute('data-theme', theme);
+    localStorage.setItem('aegis-theme', theme);
+
+    const iconEl = document.getElementById('theme-toggle-icon');
+    const textEl = document.getElementById('theme-toggle-text');
+    if (iconEl && textEl) {
+      if (theme === 'light') {
+        iconEl.textContent = '🌙';
+        textEl.textContent = 'Dark Mode';
+      } else {
+        iconEl.textContent = '☀️';
+        textEl.textContent = 'Light Mode';
+      }
+    }
+
+    if (this.ui.map) this.ui.map.setThemeTile(theme);
+    if (this.ui.charts) this.ui.charts.setTheme(theme);
+  }
+
+  toggleTheme() {
+    const nextTheme = this.currentTheme === 'light' ? 'dark' : 'light';
+    this.setTheme(nextTheme);
   }
 
   bindNavigation() {
