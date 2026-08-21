@@ -284,19 +284,20 @@ window.DP.DashboardComponent = class {
 
       return `
         <div class="incident-item ${sevClass}" onclick="window.DP.App.ui.dashboard.openIncidentModal('${inc.id}')">
-          ${inc.severity >= 5 ? '<div class="critical-pulse"></div>' : ''}
-          <div class="incident-icon">${icon}</div>
-          <div class="incident-info">
-            <div class="incident-title">${inc.title}</div>
-            <div class="incident-meta">
-              <span class="badge ${badgeCls}">L${inc.severity} Severity</span>
-              <span class="incident-pop">👥 ${(inc.populationAffected || 0).toLocaleString()}</span>
-              <span class="incident-time">${window.DP.Helpers.timeAgo(inc.timestamp)}</span>
+          <div class="incident-item-left">
+            <div class="incident-type-icon">${icon}</div>
+            <div class="incident-info">
+              <div class="incident-title">${inc.title}</div>
+              <div class="incident-meta">
+                <span class="badge ${badgeCls}">L${inc.severity} Severity</span>
+                <span class="incident-pop">👥 ${(inc.populationAffected || 0).toLocaleString()}</span>
+                <span class="incident-time">${window.DP.Helpers.timeAgo(inc.timestamp)}</span>
+              </div>
             </div>
           </div>
-          <div class="incident-status-col">
-            <span class="status-dot ${inc.status === 'ACTIVE' ? (inc.severity >= 4 ? 'critical' : 'high') : 'low'}"></span>
+          <div class="incident-item-right">
             <div class="responder-count">🚓 ${inc.responders || 0}</div>
+            <span class="status-dot ${inc.status === 'ACTIVE' ? (inc.severity >= 4 ? 'critical' : 'high') : 'low'}"></span>
           </div>
         </div>`;
     }).join('');
