@@ -81,111 +81,20 @@ window.DP.MapManager = class {
 
   toggle3DMode() {
     this.is3DMode = !this.is3DMode;
+    const mapView = document.getElementById('map-view');
     const btn = document.getElementById('btn-toggle-3d');
-    const leafletMap = document.getElementById('map');
-    const cesiumContainer = document.getElementById('cesiumContainer');
 
     if (this.is3DMode) {
-      if (btn) btn.innerHTML = '<span class="map-ctrl-icon">🗺️</span> Switch to 2D Map Mode';
-      if (leafletMap) leafletMap.style.display = 'none';
-      if (cesiumContainer) cesiumContainer.style.display = 'block';
-
-      this.initCesium3DGlobe();
+      if (mapView) mapView.classList.add('perspective-3d');
+      if (btn) btn.innerHTML = '<span class="map-ctrl-icon">🗺️</span> Switch to 2D Flat Map';
     } else {
-      if (btn) btn.innerHTML = '<span class="map-ctrl-icon">🌐</span> Switch to 3D Globe Mode';
-      if (cesiumContainer) cesiumContainer.style.display = 'none';
-      if (leafletMap) leafletMap.style.display = 'block';
-      if (this.map) this.map.invalidateSize();
+      if (mapView) mapView.classList.remove('perspective-3d');
+      if (btn) btn.innerHTML = '<span class="map-ctrl-icon">🌐</span> Switch to 3D Tactical Perspective';
     }
-  }
 
-  initCesium3DGlobe() {
-    const cesiumContainer = document.getElementById('cesiumContainer');
-    if (!cesiumContainer) return;
-
-    const center = this._pendingCenter || window.DP.CONSTANTS.MAP.DEFAULT_CENTER;
-
-    if (!this.cesiumViewer && window.Cesium) {
-      try {
-        // Use OSM imagery provider so no Ion token is needed and terrain/earth imagery loads 100% reliably!
-        const osmProvider = new window.Cesium.UrlTemplateImageryProvider({
-          url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-          maximumLevel: 19
-        });
-
-        this.cesiumViewer = new window.Cesium.Viewer('cesiumContainer', {
-          imageryProvider: osmProvider,
-          animation: false,
-          baseLayerPicker: false,
-          fullscreenButton: false,
-          geocoder: false,
-          homeButton: false,
-          infoBox: false,
-          sceneModePicker: false,
-          selectionIndicator: false,
-          timeline: false,
-          navigationHelpButton: false,
-          scene3DOnly: true
-        });
-
-        if (this.cesiumViewer.creditDisplay) {
-          this.cesiumViewer.creditDisplay.container.style.display = 'none';
-        }
-
-        this.cesiumViewer.camera.flyTo({
-          destination: window.Cesium.Cartesian3.fromDegrees(center[1], center[0], 35000),
-          orientation: {
-            heading: window.Cesium.Math.toRadians(0.0),
-            pitch: window.Cesium.Math.toRadians(-65.0),
-            roll: 0.0
-          },
-          duration: 1.5
-        });
-
-        this.renderCesium3DEntities();
-
-      } catch (e) {
-        console.warn('Cesium 3D Viewer fallback mode:', e);
-      }
-    } else if (this.cesiumViewer && window.Cesium) {
-      this.cesiumViewer.camera.flyTo({
-        destination: window.Cesium.Cartesian3.fromDegrees(center[1], center[0], 35000),
-        orientation: {
-          heading: window.Cesium.Math.toRadians(0.0),
-          pitch: window.Cesium.Math.toRadians(-65.0),
-          roll: 0.0
-        },
-        duration: 1.5
-      });
-      this.renderCesium3DEntities();
+    if (this.map) {
+      setTimeout(() => this.map.invalidateSize(), 350);
     }
-  }
-
-  renderCesium3DEntities() {
-    if (!this.cesiumViewer || !window.Cesium) return;
-    this.cesiumViewer.entities.removeAll();
-
-    const incidents = window.DP.App?.simulator?.incidents || [];
-    incidents.forEach(inc => {
-      const color = inc.severity >= 4 ? window.Cesium.Color.RED : window.Cesium.Color.CYAN;
-      this.cesiumViewer.entities.add({
-        position: window.Cesium.Cartesian3.fromDegrees(inc.lng, inc.lat, 100),
-        point: {
-          pixelSize: 14,
-          color: color,
-          outlineColor: window.Cesium.Color.WHITE,
-          outlineWidth: 2
-        },
-        label: {
-          text: `🚨 ${inc.title} (L${inc.severity})`,
-          font: '13px sans-serif',
-          style: window.Cesium.LabelStyle.FILL_AND_OUTLINE,
-          outlineWidth: 2,
-          verticalOrigin: window.Cesium.VerticalOrigin.BOTTOM,
-          pixelOffset: new window.Cesium.Cartesian2(0, -15)
-        }
-      });
-    });
   }
 
   render(data) {
