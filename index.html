@@ -24,6 +24,7 @@
   <!-- App CSS -->
   <link rel="stylesheet" href="css/index.css">
   <link rel="stylesheet" href="css/splash.css">
+  <link rel="stylesheet" href="css/home.css">
   <link rel="stylesheet" href="css/dashboard.css">
   <link rel="stylesheet" href="css/map.css">
   <link rel="stylesheet" href="css/components.css">
@@ -64,11 +65,11 @@
 
     <!-- ===== SIDEBAR ===== -->
     <aside id="sidebar">
-      <div class="sidebar-logo">
-        <div class="logo-icon">🚨</div>
+      <div class="sidebar-logo" onclick="window.DP.App.switchView('home')" style="cursor: pointer;" title="Go to Home Landing Page">
+        <div class="logo-icon">🛡️</div>
         <div class="logo-text">
-          <div class="logo-name">AEGIS</div>
-          <div class="logo-sub">AI Guardian System</div>
+          <div class="logo-name">AEGIS AI</div>
+          <div class="logo-sub">EMERGENCY INTELLIGENCE</div>
         </div>
       </div>
 
@@ -79,35 +80,55 @@
 
       <nav class="sidebar-nav">
         <div class="nav-section">
-          <div class="nav-section-title">Command Views</div>
+          <div class="nav-section-title">Navigation</div>
+          <div class="nav-item" data-view="home" id="nav-home">
+            <span class="nav-icon">🏠</span>
+            <span>Home Landing</span>
+          </div>
           <div class="nav-item active" data-view="dashboard" id="nav-dashboard">
             <span class="nav-icon">📊</span>
             <span>Dashboard</span>
           </div>
           <div class="nav-item" data-view="map" id="nav-map">
             <span class="nav-icon">🗺️</span>
-            <span>GIS Map Command</span>
+            <span>Live Map</span>
             <span class="nav-badge" id="alert-badge"></span>
           </div>
           <div class="nav-item" data-view="resources" id="nav-resources">
             <span class="nav-icon">📦</span>
-            <span>Resource Fleet</span>
+            <span>Resources Fleet</span>
           </div>
           <div class="nav-item" data-view="comms" id="nav-comms">
-            <span class="nav-icon">📡</span>
-            <span>Comms &amp; Dispatch</span>
+            <span class="nav-icon">🔔</span>
+            <span>Alerts &amp; Comms</span>
+          </div>
+          <div class="nav-item" data-view="analytics" id="nav-analytics">
+            <span class="nav-icon">📄</span>
+            <span>Reports &amp; Trends</span>
+          </div>
+          <div class="nav-item" data-view="ai" id="nav-ai">
+            <span class="nav-icon">🧠</span>
+            <span>AI Intelligence</span>
           </div>
         </div>
 
         <div class="nav-section">
-          <div class="nav-section-title">Analytics &amp; Intelligence</div>
-          <div class="nav-item" data-view="analytics" id="nav-analytics">
-            <span class="nav-icon">📈</span>
-            <span>Predictive Analytics</span>
+          <div class="nav-section-title">Quick Action</div>
+          <div class="nav-item" onclick="window.DP.App.ui.dashboard.showActiveIncidentsModal()">
+            <span class="nav-icon">➕</span>
+            <span>New Incident</span>
           </div>
-          <div class="nav-item" data-view="ai" id="nav-ai">
-            <span class="nav-icon">🧠</span>
-            <span>AI Algorithmic Engine</span>
+          <div class="nav-item" onclick="window.DP.Helpers.exportNDRFCAPReport()">
+            <span class="nav-icon">📢</span>
+            <span>Broadcast Alert</span>
+          </div>
+          <div class="nav-item" onclick="window.DP.App.switchView('resources')">
+            <span class="nav-icon">🚑</span>
+            <span>Request Resource</span>
+          </div>
+          <div class="nav-item" onclick="window.DP.App.switchView('map')">
+            <span class="nav-icon">🛣️</span>
+            <span>Evacuation Plan</span>
           </div>
         </div>
       </nav>
@@ -161,139 +182,416 @@
           <button id="theme-toggle-btn" class="btn" onclick="window.DP.App.toggleTheme()" title="Toggle Light / Dark Theme" style="display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; padding: 0; min-width: 34px;">
             <span id="theme-toggle-icon" style="font-size: 16px;">🌙</span>
           </button>
-        </div>
-      </header>
-
-      <!-- CONTENT VIEWS -->
-      <div id="content">
-
-        <!-- 1. DASHBOARD VIEW -->
-        <div id="dashboard-view" class="view-container" style="display: flex;">
-
-          <!-- HERO MISSION COMMAND STRIP -->
-          <div class="command-hero-banner">
-            <div class="hero-info">
-              <span class="hero-tag">● DEFCON 2 — LIVE COMMAND MATRIX</span>
-              <div class="hero-title" id="hero-scenario-title">Cat 4 Hurricane Response Protocol</div>
-              <div class="hero-subtitle">Real-time Bayesian threat modeling, A* evacuation pathfinding, and K-Means staging hubs engaged</div>
+                <!-- 0. PUBLIC HOME LANDING VIEW (MATCHING IMAGE 2) -->
+        <div id="home-view" class="view-container" style="display: flex;">
+          
+          <!-- PUBLIC LANDING NAV -->
+          <nav class="home-nav">
+            <div class="home-logo">
+              <div class="home-logo-icon">🛡️</div>
+              <div>
+                <div class="home-logo-title">SENTINEL AI</div>
+                <div class="home-logo-sub">EMERGENCY INTELLIGENCE SYSTEM</div>
+              </div>
             </div>
-            <div class="hero-actions">
-              <button class="btn btn-primary" onclick="window.DP.App.ui.dashboard.showActiveIncidentsModal()">
-                <span>🚨 Active Command Queue</span>
+            <div class="home-nav-links">
+              <a class="home-nav-link active" onclick="window.DP.App.switchView('home')">Home</a>
+              <a class="home-nav-link" onclick="window.DP.App.switchView('map')">Live Map</a>
+              <a class="home-nav-link" onclick="window.DP.App.ui.dashboard.showActiveIncidentsModal()">Incidents</a>
+              <a class="home-nav-link" onclick="window.DP.App.switchView('ai')">AI Intelligence</a>
+              <a class="home-nav-link" onclick="window.DP.App.switchView('resources')">Resources</a>
+              <a class="home-nav-link" onclick="window.DP.App.switchView('analytics')">About Us</a>
+            </div>
+            <div class="home-nav-actions">
+              <button class="btn" onclick="window.DP.App.toggleTheme()" style="padding: 6px 12px;">🌙</button>
+              <button class="btn-command-launch" onclick="window.DP.App.switchView('dashboard')">
+                <span>Command Center</span> ➔
               </button>
             </div>
-          </div>
+          </nav>
 
-          <!-- KPI ROW -->
-          <div class="kpi-row">
-            <div class="kpi-card clickable" style="--kpi-color: var(--critical);" onclick="window.DP.App.ui.dashboard.showActiveIncidentsModal()" title="Click to view all active incidents">
-              <div class="kpi-top">
-                <div class="kpi-icon">🚨</div>
-                <div class="kpi-trend up">▲ Live List</div>
+          <!-- HERO SECTION -->
+          <div class="home-hero">
+            <div class="hero-left">
+              <div class="hero-badge-pill">
+                <span>AI-POWERED • REAL-TIME • LIFE-SAVING</span>
               </div>
-              <div class="kpi-value" id="kpi-active-incidents">0</div>
-              <div class="kpi-label">Active Incidents</div>
-            </div>
-
-            <div class="kpi-card clickable" style="--kpi-color: var(--high);" onclick="window.DP.App.ui.dashboard.showActiveIncidentsModal()" title="Click to view active incidents impact">
-              <div class="kpi-top">
-                <div class="kpi-icon">👥</div>
-                <div class="kpi-trend up">▲ At Risk</div>
-              </div>
-              <div class="kpi-value" id="kpi-affected-pop">0</div>
-              <div class="kpi-label">Population Affected</div>
-            </div>
-
-            <div class="kpi-card clickable" style="--kpi-color: var(--low);" onclick="window.DP.App.switchView('resources')" title="Click to view resource fleet">
-              <div class="kpi-top">
-                <div class="kpi-icon">🚑</div>
-                <div class="kpi-trend down">● 100% Deployed</div>
-              </div>
-              <div class="kpi-value" id="kpi-deployed-resources">0</div>
-              <div class="kpi-label">Deployed Resources</div>
-            </div>
-
-            <div class="kpi-card clickable" style="--kpi-color: var(--accent-primary);" onclick="window.DP.App.switchView('map')" title="Click to view GIS map corridors">
-              <div class="kpi-top">
-                <div class="kpi-icon">🛣️</div>
-                <div class="kpi-trend neutral">● Dynamic Cost</div>
-              </div>
-              <div class="kpi-value">A* Router</div>
-              <div class="kpi-label">Evacuation Corridors</div>
-            </div>
-
-            <div class="kpi-card clickable" style="--kpi-color: var(--accent-secondary);" onclick="window.DP.App.switchView('map')" title="Click to view staging hubs">
-              <div class="kpi-top">
-                <div class="kpi-icon">⛺</div>
-                <div class="kpi-trend neutral">● Centroid Hubs</div>
-              </div>
-              <div class="kpi-value">K-Means++</div>
-              <div class="kpi-label">Staging Relief Hubs</div>
-            </div>
-          </div>
-
-          <!-- MIDDLE ROW -->
-          <div class="dashboard-middle">
-
-            <!-- Incidents Panel -->
-            <div class="panel" id="incident-panel">
-              <div class="panel-header">
-                <div class="panel-title">
-                  <span class="icon">🔥</span> Live Incident Command Queue
-                </div>
-                <button class="btn btn-primary" style="font-size: 11px; padding: 4px 10px;" onclick="window.DP.App.ui.dashboard.showActiveIncidentsModal()">
-                  View Full List 🚨
+              <h1 class="hero-main-title">
+                AI THAT SEES THE RISK BEFORE IT BECOMES <span>A CRISIS.</span>
+              </h1>
+              <p class="hero-description">
+                SENTINEL AI detects, predicts, and helps respond to emergencies faster with intelligent insights and real-time coordination.
+              </p>
+              <div class="hero-cta-group">
+                <button class="btn-hero-primary" onclick="window.DP.App.switchView('dashboard')">
+                  <span>Launch Command Center</span> ➔
+                </button>
+                <button class="btn-hero-secondary" onclick="window.DP.App.switchView('map')">
+                  <span>View Live Situation</span> 👁️
                 </button>
               </div>
-              <div class="panel-body" id="incident-list-container"></div>
             </div>
 
-            <!-- Threat Panel -->
-            <div class="panel" id="threat-panel">
-              <div class="panel-header">
-                <div class="panel-title">
-                  <span class="icon">🧠</span> Bayesian Threat Assessment
+            <div class="hero-right">
+              <div class="globe-preview-card">
+                <div class="globe-pin critical" style="top: 25%; left: 60%;">
+                  <span>🚨 FLOOD RISK</span> <strong>HIGH</strong>
                 </div>
-                <div class="badge badge-high" id="threat-level-badge">HIGH RISK</div>
+                <div class="globe-pin moderate" style="top: 35%; left: 70%;">
+                  <span>🔥 WILDFIRE</span> <strong>MODERATE</strong>
+                </div>
+                <div class="globe-pin moderate" style="top: 55%; left: 45%;">
+                  <span>🌋 EARTHQUAKE</span> <strong>MODERATE</strong>
+                </div>
+                <div class="globe-pin low" style="top: 65%; left: 75%;">
+                  <span>⚡ STORM ALERT</span> <strong>LOW</strong>
+                </div>
               </div>
-              <div class="panel-body">
-                <div class="threat-center-box">
-                  <svg class="threat-svg-ring" viewBox="0 0 130 130">
-                    <circle class="threat-ring-bg" cx="65" cy="65" r="52" />
-                    <circle class="threat-ring-val" id="threat-ring-fill" cx="65" cy="65" r="52" stroke-dasharray="326.7" stroke-dashoffset="100" />
-                  </svg>
-                  <div class="threat-ring-text">
-                    <div class="threat-ring-score" id="threat-ring-pct">0%</div>
-                    <div class="threat-ring-sub">THREAT INDEX</div>
-                  </div>
-                </div>
 
-                <div class="threat-probs">
-                  <div class="threat-prob-header">
-                    <span>Multi-Hazard Assessment</span>
-                    <span>Probability</span>
+              <!-- FLOATING WIDGET -->
+              <div class="hero-overview-widget">
+                <div class="widget-title">Live Overview</div>
+                <div class="widget-item">
+                  <div class="widget-item-left">
+                    <span>🚨</span>
+                    <div>
+                      <div class="widget-item-val" id="home-widget-inc">12</div>
+                      <div class="widget-item-lbl">Active Incidents</div>
+                    </div>
                   </div>
-                  <div id="threat-breakdown-container"></div>
+                  <span class="badge badge-critical">4 Critical</span>
                 </div>
+                <div class="widget-item">
+                  <div class="widget-item-left">
+                    <span>👥</span>
+                    <div>
+                      <div class="widget-item-val" id="home-widget-units">27</div>
+                      <div class="widget-item-lbl">Response Units</div>
+                    </div>
+                  </div>
+                  <span style="font-size: 10px; color: #38bdf8; font-weight: 700;">View Units</span>
+                </div>
+                <div class="widget-item">
+                  <div class="widget-item-left">
+                    <span>🛡️</span>
+                    <div>
+                      <div class="widget-item-val">93%</div>
+                      <div class="widget-item-lbl">Resource Availability</div>
+                    </div>
+                  </div>
+                  <span class="badge badge-low">Optimal</span>
+                </div>
+                <div class="widget-item">
+                  <div class="widget-item-left">
+                    <span>👥</span>
+                    <div>
+                      <div class="widget-item-val" id="home-widget-pop">12,400</div>
+                      <div class="widget-item-lbl">People Protected</div>
+                    </div>
+                  </div>
+                  <span style="font-size: 10px; color: #94a3b8;">Today</span>
+                </div>
+                <button class="btn btn-primary" style="margin-top: 4px; font-size: 11px;" onclick="window.DP.App.switchView('dashboard')">
+                  Go to Dashboard ➔
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- FEATURES BAR -->
+          <div class="home-features-bar">
+            <div>
+              <div class="feature-intro-title">INTELLIGENCE THAT MAKES A DIFFERENCE</div>
+              <div class="feature-intro-desc">SENTINEL AI uses advanced AI models, IoT data, satellite imagery, and citizen reports to deliver real-time intelligence and save lives.</div>
+            </div>
+            <div class="feature-pillar">
+              <div class="feature-pillar-title"><span>🧠</span> AI Risk Prediction</div>
+              <div class="feature-pillar-desc">Predict disasters before they happen</div>
+            </div>
+            <div class="feature-pillar">
+              <div class="feature-pillar-title"><span>🔔</span> Real-time Alerts</div>
+              <div class="feature-pillar-desc">Instant multi-source data alerts</div>
+            </div>
+            <div class="feature-pillar">
+              <div class="feature-pillar-title"><span>👥</span> Smart Coordination</div>
+              <div class="feature-pillar-desc">Connect teams and resources</div>
+            </div>
+            <div class="feature-pillar">
+              <div class="feature-pillar-title"><span>⚙️</span> Continuous Learning</div>
+              <div class="feature-pillar-desc">Self-improving AI models</div>
+            </div>
+          </div>
+
+          <!-- HOW IT WORKS SECTION -->
+          <div class="home-how-it-works">
+            <div class="section-header-center">
+              <span class="section-tag">HOW SENTINEL AI WORKS</span>
+              <h2 class="section-title">Detect. Predict. Decide. Respond.</h2>
+            </div>
+            <div class="steps-grid">
+              <div class="step-card">
+                <div class="step-num">01</div>
+                <div class="step-title">DETECT</div>
+                <div class="step-desc">AI scans multiple data sources including sensors, satellite imagery, CCTV, and citizen reports.</div>
+                <div class="step-link" onclick="window.DP.App.switchView('map')">Learn more ➔</div>
+              </div>
+              <div class="step-card">
+                <div class="step-num">02</div>
+                <div class="step-title">PREDICT</div>
+                <div class="step-desc">Machine learning models predict severity, impact area, and potential risk spread.</div>
+                <div class="step-link" onclick="window.DP.App.switchView('analytics')">Learn more ➔</div>
+              </div>
+              <div class="step-card">
+                <div class="step-num">03</div>
+                <div class="step-title">DECIDE</div>
+                <div class="step-desc">AI recommends optimal evacuation routes and resource allocation staging hubs.</div>
+                <div class="step-link" onclick="window.DP.App.switchView('ai')">Learn more ➔</div>
+              </div>
+              <div class="step-card">
+                <div class="step-num">04</div>
+                <div class="step-title">RESPOND</div>
+                <div class="step-desc">Coordinate response teams and communicate in real-time to ensure faster relief.</div>
+                <div class="step-link" onclick="window.DP.App.switchView('resources')">Learn more ➔</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- STATS BAR FOOTER -->
+          <div class="home-stats-bar">
+            <div class="stat-box">
+              <div class="stat-box-val">2.4M+</div>
+              <div class="stat-box-lbl">Data Points Analyzed Every Day</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-box-val">150+</div>
+              <div class="stat-box-lbl">Organizations Connected Worldwide</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-box-val">98.7%</div>
+              <div class="stat-box-lbl">Prediction Accuracy (AI Models)</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-box-val">3.2 min</div>
+              <div class="stat-box-lbl">Average Response Time Reduced</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-box-val">85K+</div>
+              <div class="stat-box-lbl">Lives Impacted So Far</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 1. DASHBOARD VIEW (MATCHING IMAGE 1) -->
+        <div id="dashboard-view" class="view-container" style="display: none;">
+
+          <!-- TOP 5 KPI CARDS -->
+          <div class="dash-kpi-row">
+            <div class="dash-kpi-card" onclick="window.DP.App.ui.dashboard.showActiveIncidentsModal()" style="cursor: pointer;">
+              <div class="dash-kpi-icon-wrap active">📈</div>
+              <div class="dash-kpi-info">
+                <div class="dash-kpi-val" id="kpi-active-incidents">12</div>
+                <div class="dash-kpi-lbl">Active Incidents</div>
+                <div class="dash-kpi-sub" style="color: #38bdf8;">↗ 2 from last hour</div>
+              </div>
+            </div>
+
+            <div class="dash-kpi-card" onclick="window.DP.App.ui.dashboard.showActiveIncidentsModal()" style="cursor: pointer;">
+              <div class="dash-kpi-icon-wrap critical">🚨</div>
+              <div class="dash-kpi-info">
+                <div class="dash-kpi-val" id="dash-critical-count">04</div>
+                <div class="dash-kpi-lbl">Critical Incidents</div>
+                <div class="dash-kpi-sub" style="color: #f43f5e;">↗ 1 from last hour</div>
+              </div>
+            </div>
+
+            <div class="dash-kpi-card" onclick="window.DP.App.switchView('resources')" style="cursor: pointer;">
+              <div class="dash-kpi-icon-wrap units">👥</div>
+              <div class="dash-kpi-info">
+                <div class="dash-kpi-val" id="kpi-deployed-resources">27</div>
+                <div class="dash-kpi-lbl">Response Units</div>
+                <div class="dash-kpi-sub" style="color: #0284c7;">Deployed Fleet</div>
+              </div>
+            </div>
+
+            <div class="dash-kpi-card">
+              <div class="dash-kpi-icon-wrap avail">🛡️</div>
+              <div class="dash-kpi-info">
+                <div class="dash-kpi-val">93%</div>
+                <div class="dash-kpi-lbl">Resource Availability</div>
+                <div class="dash-kpi-sub" style="color: #10b981;">All systems ready</div>
+              </div>
+            </div>
+
+            <div class="dash-kpi-card" onclick="window.DP.App.ui.dashboard.showActiveIncidentsModal()" style="cursor: pointer;">
+              <div class="dash-kpi-icon-wrap pop">👥</div>
+              <div class="dash-kpi-info">
+                <div class="dash-kpi-val" id="kpi-affected-pop">12,400</div>
+                <div class="dash-kpi-lbl">People Protected</div>
+                <div class="dash-kpi-sub" style="color: #818cf8;">Today</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- MAIN DUAL-COLUMN LAYOUT -->
+          <div class="dash-main-grid">
+
+            <!-- LEFT: EMBEDDED GIS MAP PANEL -->
+            <div class="dash-map-card">
+              <div class="dash-map-header">
+                <div>
+                  <div class="dash-map-title">LIVE SITUATION MAP</div>
+                  <div class="dash-map-subtitle">Real-time overview of all incidents</div>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                  <button class="btn btn-sm" onclick="window.DP.App.switchView('map')">All Incidents ▾</button>
+                  <button class="btn btn-sm" onclick="window.DP.App.ui.map.toggle3DMode()">3D View 🌐</button>
+                </div>
+              </div>
+
+              <!-- EMBEDDED MAP CANVAS -->
+              <div class="dash-map-container" id="dashboard-map"></div>
+
+              <!-- FLOATING MAP LEGEND PILL -->
+              <div class="dash-map-legend-pill">
+                <div class="legend-item"><span class="legend-dot crit"></span> Critical</div>
+                <div class="legend-item"><span class="legend-dot high"></span> High</div>
+                <div class="legend-item"><span class="legend-dot mod"></span> Moderate</div>
+                <div class="legend-item"><span class="legend-dot low"></span> Low</div>
+                <div class="legend-item"><span class="legend-dot res"></span> Resolved</div>
+              </div>
+            </div>
+
+            <!-- RIGHT: AI INCIDENT ANALYSIS & ALERTS -->
+            <div class="dash-right-col">
+
+              <!-- AI INCIDENT ANALYSIS CARD -->
+              <div class="ai-analysis-card">
+                <div class="ai-analysis-header">
+                  <span>🚨</span> Flood Risk Detected
+                </div>
+                <div class="ai-analysis-grid">
+                  <div class="ai-grid-lbl">Confidence</div>
+                  <div class="ai-grid-val">94%</div>
+                  <div class="ai-grid-lbl">Affected Area</div>
+                  <div class="ai-grid-val">8.4 km²</div>
+                  <div class="ai-grid-lbl">Estimated Population</div>
+                  <div class="ai-grid-val">12,400</div>
+                  <div class="ai-grid-lbl">Risk Level</div>
+                  <div class="ai-grid-val critical">HIGH</div>
+                </div>
+                <div class="ai-recommendation-text">
+                  <strong>AI Recommendation:</strong> Evacuate Zone B and deploy 3 rescue units to Sector 4 immediately.
+                </div>
+                <button class="btn-initiate-response" onclick="window.DP.App.ui.dashboard.showActiveIncidentsModal()">
+                  Initiate Response ➔
+                </button>
+              </div>
+
+              <!-- RECENT ALERTS WIDGET -->
+              <div class="recent-alerts-card">
+                <div class="alerts-card-header">
+                  <div class="alerts-card-title">Recent Alerts</div>
+                  <div class="alerts-card-link" onclick="window.DP.App.switchView('comms')">View All</div>
+                </div>
+                <div class="alerts-list">
+                  <div class="alert-row-item">
+                    <div class="alert-row-left">
+                      <span class="alert-row-dot" style="background:#f43f5e;"></span>
+                      <div>
+                        <div class="alert-row-title">Flood Warning</div>
+                        <div class="alert-row-sub">Sector 4, Riverside Area</div>
+                      </div>
+                    </div>
+                    <div class="alert-row-time">10:25 AM</div>
+                  </div>
+                  <div class="alert-row-item">
+                    <div class="alert-row-left">
+                      <span class="alert-row-dot" style="background:#fbbf24;"></span>
+                      <div>
+                        <div class="alert-row-title">Landslide Risk</div>
+                        <div class="alert-row-sub">Hill Zone, North Sector</div>
+                      </div>
+                    </div>
+                    <div class="alert-row-time">09:40 AM</div>
+                  </div>
+                  <div class="alert-row-item">
+                    <div class="alert-row-left">
+                      <span class="alert-row-dot" style="background:#fbbf24;"></span>
+                      <div>
+                        <div class="alert-row-title">High Wind Alert</div>
+                        <div class="alert-row-sub">Coastal Area, Sector 7</div>
+                      </div>
+                    </div>
+                    <div class="alert-row-time">08:15 AM</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- RESPONSE UNITS WIDGET -->
+              <div class="response-units-card">
+                <div class="alerts-card-header">
+                  <div class="alerts-card-title">Response Units</div>
+                  <div class="alerts-card-link" onclick="window.DP.App.switchView('resources')">View All</div>
+                </div>
+                <div class="alerts-list">
+                  <div class="units-row-item">
+                    <span>🚑 Rescue Teams</span>
+                    <span class="units-row-count" style="color:#38bdf8;">12</span>
+                  </div>
+                  <div class="units-row-item">
+                    <span>🏥 Medical Teams</span>
+                    <span class="units-row-count" style="color:#10b981;">06</span>
+                  </div>
+                  <div class="units-row-item">
+                    <span>🚒 Fire Units</span>
+                    <span class="units-row-count" style="color:#fb923c;">05</span>
+                  </div>
+                  <div class="units-row-item">
+                    <span>🚓 Police Units</span>
+                    <span class="units-row-count" style="color:#818cf8;">04</span>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- BOTTOM 3 CHARTS ROW -->
+          <div class="dash-charts-row">
+
+            <div class="chart-card-box">
+              <div class="chart-box-header">
+                <div class="chart-box-title">Incident Trend</div>
+                <select class="scenario-select" style="padding: 2px 8px; font-size: 10px;">
+                  <option>Last 7 Days</option>
+                  <option>Last 24 Hours</option>
+                </select>
+              </div>
+              <div class="chart-wrapper">
+                <canvas id="chart-incident-trend"></canvas>
+              </div>
+            </div>
+
+            <div class="chart-card-box">
+              <div class="chart-box-header">
+                <div class="chart-box-title">Incident By Type</div>
+              </div>
+              <div class="chart-wrapper">
+                <canvas id="chart-disaster-types"></canvas>
+              </div>
+            </div>
+
+            <div class="chart-card-box">
+              <div class="chart-box-header">
+                <div class="chart-box-title">Resource Status</div>
+              </div>
+              <div class="chart-wrapper">
+                <canvas id="chart-resource-allocation"></canvas>
               </div>
             </div>
 
           </div>
-
-          <!-- BOTTOM ROW -->
-          <div class="dashboard-bottom">
-
-            <div class="panel">
-              <div class="panel-header">
-                <div class="panel-title"><span class="icon">💡</span> AI Neural Insights</div>
-              </div>
-              <div class="panel-body" id="ai-insights-container"></div>
-            </div>
-
-            <div class="panel">
-              <div class="panel-header">
-                <div class="panel-title"><span class="icon">🌡️</span> Real-Time Weather Telemetry</div>
-              </div>
+        </div>iv>
               <div class="panel-body" id="weather-grid-container"></div>
             </div>
 

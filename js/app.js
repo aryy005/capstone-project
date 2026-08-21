@@ -261,24 +261,31 @@ class Application {
       el.style.display = 'none';
     });
 
-    // Show selected view — map and dashboard use flex, others use block
+    // Show selected view — home, dashboard and map use flex, others use block
     const target = document.getElementById(`${viewId}-view`);
     if (target) {
-      const flexViews = ['dashboard', 'map'];
+      const flexViews = ['home', 'dashboard', 'map'];
       target.style.display = flexViews.includes(viewId) ? 'flex' : 'block';
+    }
+
+    // Lazy init dashboard embedded map
+    if (viewId === 'dashboard') {
+      requestAnimationFrame(() => {
+        this.ensureDashboardMap();
+        if (this.ui.charts) {
+          this.ui.charts.resizeAll();
+        }
+      });
     }
 
     // Map lazy-init: only create Leaflet when container is visible with real dimensions
     if (viewId === 'map') {
-      // Wait one frame for the DOM to paint the visible container
       requestAnimationFrame(() => {
         this.ui.map.ensureInit();
         if (this.ui.map.map) {
           this.ui.map.map.invalidateSize();
-          // Pan to current scenario
           this.ui.map.setCenter(this.selectedScenario.center, 10);
         }
-        // Render map data after init
         this.ui.map.render({
           incidents: this.simulator.incidents,
           resources: this.simulator.resources,
@@ -286,10 +293,10 @@ class Application {
           ai:        this.ai
         });
       });
-      return; // updateUI called inside requestAnimationFrame above
+      return;
     }
 
-    if (viewId === 'analytics' || viewId === 'dashboard') {
+    if (viewId === 'analytics') {
       requestAnimationFrame(() => {
         if (this.ui.charts) {
           this.ui.charts.resizeAll();
@@ -298,6 +305,52 @@ class Application {
     }
 
     this.updateUI();
+  }
+
+  ensureDashboardMap() {
+    const container = document.getElementById('dashboard-map');
+    if (!container) return;
+
+    if (!this.dashboardMap && window.L) {
+      const center = this.selectedScenario?.center || [13.0827, 80.2707];
+      this.dashboardMap = L.map('dashboard-map', {
+        center: center,
+        zoom: 10,
+        zoomControl: false,
+        attributionControl: false
+      });
+
+      const theme = document.body.getAttribute('data-theme') || 'dark';
+      const tileUrl = theme === 'light'
+        ? 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png'
+        : 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+
+      L.tileLayer(tileUrl, { maxZoom: 19 }).addTo(this.dashboardMap);
+      this.dashMarkersLayer = L.layerGroup().addTo(this.dashboardMap);
+    } else if (this.dashboardMap) {
+      this.dashboardMap.invalidateSize();
+      if (this.selectedScenario?.center) {
+        this.dashboardMap.setView(this.selectedScenario.center, 10);
+      }
+    }
+
+    if (this.dashboardMap && this.dashMarkersLayer) {
+      this.dashMarkersLayer.clearLayers();
+      const incidents = this.simulator?.incidents || [];
+      incidents.forEach(inc => {
+        const color = inc.severity >= 4 ? '#f43f5e' : (inc.severity >= 3 ? '#fbbf24' : '#38bdf8');
+        const marker = L.circleMarker([inc.lat, inc.lng], {
+          radius: 8,
+          fillColor: color,
+          color: '#ffffff',
+          weight: 2,
+          opacity: 1,
+          fillOpacity: 0.9
+        });
+        marker.bindTooltip(`🚨 ${inc.title} (L${inc.severity})`);
+        marker.addTo(this.dashMarkersLayer);
+      });
+    }
   }
 
   selectIncident(id) {
