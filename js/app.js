@@ -255,6 +255,14 @@ class Application {
       return; // updateUI called inside requestAnimationFrame above
     }
 
+    if (viewId === 'analytics' || viewId === 'dashboard') {
+      requestAnimationFrame(() => {
+        if (this.ui.charts) {
+          this.ui.charts.resizeAll();
+        }
+      });
+    }
+
     this.updateUI();
   }
 

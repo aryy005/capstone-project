@@ -243,9 +243,41 @@ window.DP.ChartManager = class {
     });
   }
 
+  resizeAll() {
+    Object.values(this.charts).forEach(chart => {
+      if (chart && typeof chart.resize === 'function') {
+        chart.resize();
+      }
+    });
+  }
+
   update(data) {
     const { simulator, ai } = data;
     if (!this.charts.incidentTrend) this.init();
+
+    // Update Analytics KPI summary elements if present
+    const bayValEl = document.getElementById('analytics-kpi-bayesian');
+    const bayTypeEl = document.getElementById('analytics-kpi-bayesian-type');
+    if (bayValEl && ai?.bayesian) {
+      const top = ai.bayesian.getTopThreat();
+      bayValEl.textContent = `${Math.round((top.probability || 0) * 100)}%`;
+      if (bayTypeEl) bayTypeEl.textContent = top.type ? window.DP.Helpers.capitalize(top.type) : 'Inference Engine';
+    }
+
+    const monteEl = document.getElementById('analytics-kpi-monte');
+    if (monteEl && ai?.monteCarlo?.results) {
+      monteEl.textContent = `${(ai.monteCarlo.results.maxProbability * 100).toFixed(1)}%`;
+    }
+
+    const dtreeEl = document.getElementById('analytics-kpi-dtree');
+    if (dtreeEl && ai?.decisionTree) {
+      dtreeEl.textContent = `${ai.decisionTree.getAverageSeverity()} / 5.0`;
+    }
+
+    const corrEl = document.getElementById('analytics-kpi-corridors');
+    if (corrEl && ai?.astar) {
+      corrEl.textContent = `${(ai.astar.routes || []).length} active`;
+    }
 
     // Update Threat Radar with Bayesian posteriors
     if (this.charts.threatRadar && ai?.bayesian) {

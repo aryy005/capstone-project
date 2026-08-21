@@ -304,6 +304,36 @@
 
         <!-- 5. ANALYTICS VIEW -->
         <div id="analytics-view" class="view-container" style="display: none;">
+          <div class="analytics-kpi-row" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; margin-bottom: 16px; padding: 16px 16px 0 16px;">
+            <div class="kpi-card" style="--kpi-color: #00d4ff;">
+              <div class="kpi-icon">🧠</div>
+              <div class="kpi-value" id="analytics-kpi-bayesian">0%</div>
+              <div class="kpi-label">Bayesian Threat Prob</div>
+              <div class="kpi-trend up" id="analytics-kpi-bayesian-type">Inference Engine</div>
+            </div>
+
+            <div class="kpi-card" style="--kpi-color: #ff1744;">
+              <div class="kpi-icon">📈</div>
+              <div class="kpi-value" id="analytics-kpi-monte">0%</div>
+              <div class="kpi-label">Monte Carlo Peak Spread</div>
+              <div class="kpi-trend up">500 Iterations</div>
+            </div>
+
+            <div class="kpi-card" style="--kpi-color: #ffd600;">
+              <div class="kpi-icon">🌲</div>
+              <div class="kpi-value" id="analytics-kpi-dtree">0.0</div>
+              <div class="kpi-label">Avg Incident Severity</div>
+              <div class="kpi-trend down">START Triage Protocol</div>
+            </div>
+
+            <div class="kpi-card" style="--kpi-color: #00e676;">
+              <div class="kpi-icon">🛣️</div>
+              <div class="kpi-value" id="analytics-kpi-corridors">0</div>
+              <div class="kpi-label">Active A* Corridors</div>
+              <div class="kpi-trend down">Evacuation Corridors</div>
+            </div>
+          </div>
+
           <div class="charts-grid">
             <div class="chart-card">
               <div class="chart-card-title">📈 24h Incident Trajectory</div>
