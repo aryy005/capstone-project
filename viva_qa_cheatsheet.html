@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AEGIS — Capstone Viva Evaluation Q&A Cheat Sheet</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+    
+    @page { size: A4; margin: 20mm; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f8fafc;
+      color: #0f172a;
+      line-height: 1.6;
+      padding: 40px;
+    }
+
+    .no-print-bar {
+      position: fixed; top: 0; left: 0; right: 0;
+      background: #0f172a; color: #ffffff;
+      padding: 12px 24px; display: flex; align-items: center; justify-content: space-between;
+      z-index: 9999; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .no-print-bar button {
+      background: #0284c7; color: white; border: none; padding: 8px 18px;
+      border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 14px;
+    }
+    .no-print-bar button:hover { background: #0369a1; }
+
+    @media print {
+      .no-print-bar { display: none !important; }
+      body { padding: 0; background: #ffffff; }
+      .page-break { page-break-before: always; }
+    }
+
+    .doc-container {
+      max-width: 800px; margin: 50px auto 0 auto; background: #ffffff;
+      padding: 48px; border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+      border: 1px solid #e2e8f0;
+    }
+
+    .header-block { border-bottom: 3px solid #0284c7; padding-bottom: 24px; margin-bottom: 32px; }
+    .header-badge { display: inline-block; background: #e0f2fe; color: #0369a1; font-size: 11px; font-weight: 700; letter-spacing: 1px; padding: 4px 10px; border-radius: 4px; text-transform: uppercase; margin-bottom: 12px; }
+    h1 { font-size: 26px; font-weight: 800; color: #0f172a; line-height: 1.3; }
+    .subtitle { font-size: 14px; color: #475569; margin-top: 6px; }
+
+    .qa-box {
+      background: #f8fafc; border: 1px solid #e2e8f0; border-left: 4px solid #0284c7;
+      border-radius: 8px; padding: 18px; margin-bottom: 18px;
+    }
+    .qa-q { font-size: 14px; font-weight: 700; color: #0f172a; margin-bottom: 8px; }
+    .qa-a { font-size: 13px; color: #334155; line-height: 1.6; }
+    .qa-tag { display: inline-block; background: #e2e8f0; color: #475569; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; margin-bottom: 6px; }
+    code { font-family: 'JetBrains Mono', monospace; background: #e2e8f0; padding: 2px 6px; border-radius: 4px; font-size: 11px; }
+  </style>
+</head>
+<body>
+
+  <div class="no-print-bar">
+    <div><strong>AEGIS Viva Q&amp;A Preparation Cheat Sheet</strong> — Ready for PDF Download</div>
+    <button onclick="window.print()">🖨️ Download / Save as PDF</button>
+  </div>
+
+  <div class="doc-container">
+    <div class="header-block">
+      <span class="header-badge">Capstone Viva Preparation</span>
+      <h1>AEGIS — Top 15 Expected Viva Questions &amp; Expert Answers</h1>
+      <div class="subtitle">Quick-reference guide for Capstone Evaluators &amp; Examiners</div>
+    </div>
+
+    <div class="qa-box">
+      <span class="qa-tag">Q1 • System Concept</span>
+      <div class="qa-q">Q1: What is the main objective of the AEGIS project?</div>
+      <div class="qa-a"><strong>Answer:</strong> AEGIS is an AI-powered emergency command center platform designed to reduce emergency response latency by combining 6 client-side AI algorithms (Bayesian inference, A* routing, K-Means clustering, Decision Tree triage, Monte Carlo simulation, and Neural Network damage prediction) to triage incidents, compute evacuation routes, allocate rescue fleets, and export OASIS CAP alerts.</div>
+    </div>
+
+    <div class="qa-box">
+      <span class="qa-tag">Q2 • AI Algorithms</span>
+      <div class="qa-q">Q2: How does the A* Pathfinding algorithm avoid hazard zones?</div>
+      <div class="qa-a"><strong>Answer:</strong> The A* router evaluates cost <code>f(n) = g(n) + h(n)</code> on a 50×50 spatial grid, applying a dynamic hazard penalty function <code>W(e) = Dist(e) × (1 + 1000 × Risk(e))</code>. When an edge intersects a flood or chemical hazard zone, its cost increases 1,000-fold, forcing the algorithm to find a safe alternative route.</div>
+    </div>
+
+    <div class="qa-box">
+      <span class="qa-tag">Q3 • AI Algorithms</span>
+      <div class="qa-q">Q3: Why did you use K-Means++ clustering for staging hubs?</div>
+      <div class="qa-a"><strong>Answer:</strong> Standard K-Means can get stuck in poor local minima depending on initial centroid choices. K-Means++ seeds initial centroids proportional to squared distance, ensuring optimal spatial positioning of relief camps relative to emergency incident clusters using Haversine spherical distance.</div>
+    </div>
+
+    <div class="qa-box">
+      <span class="qa-tag">Q4 • System Architecture</span>
+      <div class="qa-q">Q4: Why is the platform built using Vanilla JS without heavy frameworks like React?</div>
+      <div class="qa-a"><strong>Answer:</strong> Vanilla JavaScript ensures ultra-fast boot times, zero framework bundle overhead, 60 FPS GIS rendering performance, and zero-dependency offline PWA execution on low-spec emergency response hardware and mobile devices.</div>
+    </div>
+
+    <div class="qa-box">
+      <span class="qa-tag">Q5 • Real Data</span>
+      <div class="qa-q">Q5: Is the weather data real or hardcoded?</div>
+      <div class="qa-a"><strong>Answer:</strong> The weather data is live and real, fetched asynchronously from the Open-Meteo REST API for scenario GPS coordinates (e.g. Chennai, Uttarakhand, Assam). The incident updates run on a real-time stochastic simulation engine for demonstration safety.</div>
+    </div>
+
+    <div class="qa-box">
+      <span class="qa-tag">Q6 • Industry Standards</span>
+      <div class="qa-q">Q6: What is OASIS CAP v1.2 and why did you implement it?</div>
+      <div class="qa-a"><strong>Answer:</strong> OASIS Common Alerting Protocol (CAP v1.2) is the international standard format for emergency alerts used by the National Disaster Management Authority (NDMA) and NDRF. AEGIS exports standardized CAP JSON/XML payloads so dispatches can interface with official national alerting infrastructure.</div>
+    </div>
+
+    <div class="qa-box">
+      <span class="qa-tag">Q7 • Mobile Support</span>
+      <div class="qa-q">Q7: How does AEGIS work on mobile devices for field responders?</div>
+      <div class="qa-a"><strong>Answer:</strong> AEGIS is structured as an installable Progressive Web App (PWA) with <code>manifest.json</code> and a background <code>service-worker.js</code> that caches core app shell assets for offline execution on responder smartphones.</div>
+    </div>
+
+    <div class="qa-box">
+      <span class="qa-tag">Q8 • Machine Learning</span>
+      <div class="qa-q">Q8: How does the 6th AI module (Neural Network) work?</div>
+      <div class="qa-a"><strong>Answer:</strong> The Neural Network is a 2-layer feed-forward model with Sigmoid activation. It takes incident magnitude, wind speed, affected population, and infrastructure vulnerability as inputs to compute non-linear casualty estimates and economic loss projections.</div>
+    </div>
+
+    <div class="qa-box">
+      <span class="qa-tag">Q9 • Future Scope</span>
+      <div class="qa-q">Q9: What is your plan for Phase 2 development?</div>
+      <div class="qa-a"><strong>Answer:</strong> Phase 2 includes YOLOv8 computer vision for aerial drone feed damage analysis, Whisper NLP for regional Indian language 112 emergency calls, direct NDMA Sachet API synchronization, and offline Bluetooth LE mesh networking.</div>
+    </div>
+
+    <div class="qa-box">
+      <span class="qa-tag">Q10 • GIS Mapping</span>
+      <div class="qa-q">Q10: How does the 3D GIS Visualization work?</div>
+      <div class="qa-a"><strong>Answer:</strong> The GIS Command map features dual visualization modes: a 2D Leaflet spatial map and a 3D Tactical Perspective matrix transformation engine (`rotateX 52°`) that elevates incident pins with 3D drop-shadows and terrain drone perspective.</div>
+    </div>
+
+    <div style="margin-top: 40px; border-top: 1px solid #e2e8f0; padding-top: 16px; font-size: 11px; color: #64748b; text-align: center;">
+      AEGIS AI Platform • Viva Examination Cheat Sheet
+    </div>
+  </div>
+
+</body>
+</html>

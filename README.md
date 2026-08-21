@@ -1,116 +1,74 @@
-# 🚨 AEGIS — AI Emergency Response & Disaster Management Platform
+# 🚨 AEGIS — AI Enabled Emergency Response & Disaster Management Platform
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Build](https://img.shields.io/badge/build-passing-brightgreen.svg)
-![AI-Powered](https://img.shields.io/badge/AI-5%20Algorithms-7c4dff.svg)
-![JavaScript](https://img.shields.io/badge/JavaScript-Vanilla-yellow.svg)
+![AI-Powered](https://img.shields.io/badge/AI-6%20Algorithms-7c4dff.svg)
+![PWA-Ready](https://img.shields.io/badge/PWA-Installable-00d4ff.svg)
+![NDRF-CAP](https://img.shields.io/badge/CAP-v1.2%20Compliant-ff1744.svg)
 
-**AEGIS** (*AI Emergency Guardian & Intelligence System*) is a real-time, browser-based disaster management and emergency response platform powered by client-side AI algorithms. Designed for emergency command centers, rescue coordinators, and field teams.
+**AEGIS** (*AI Emergency Guardian & Intelligence System*) is a real-time, browser-native disaster management and emergency response platform powered by client-side AI algorithms, live meteorological REST APIs, 2D/3D GIS mapping engines, and standardized OASIS CAP alert dispatch protocols.
 
 ---
 
-## 🌟 Key Features & AI Algorithms
+## 🌟 Key Features & AI Algorithmic Engines
 
 ### 🧠 1. Bayesian Threat Assessment Network (`js/ai/bayesian.js`)
 - **Multi-Hazard Posterior Inference**: Computes $P(\text{Disaster} \mid \text{Evidence})$ based on live environmental telemetry (wind speed, rainfall, seismic activity, temperature, humidity, incident reports).
-- **Dynamic Threat Gauge**: Real-time score calculation classifying overall risk (Minimal → Critical).
 
 ### 🛣️ 2. A* Evacuation Route Optimizer (`js/ai/astar.js`)
-- **Heuristic Pathfinding**: Implements $f(n) = g(n) + h(n)$ pathfinding on a dynamic spatial grid.
-- **Hazard Penalty Weighting**: Applies dynamic weight function $W(e) = \text{Dist}(e) \times (1 + 1000 \times \text{Risk}(e))$ to automatically route around active danger zones.
+- **Heuristic Pathfinding**: Implements $f(n) = g(n) + h(n)$ pathfinding on a dynamic spatial grid with penalty weighting $W(e) = \text{Dist}(e) \times (1 + 1000 \times \text{Risk}(e))$ to automatically route around active danger zones.
 
 ### ⛺ 3. K-Means++ Resource Clustering (`js/ai/kmeans.js`)
-- **Spatial Centroid Optimization**: Uses K-Means++ initialization with spherical Haversine distance calculations.
-- **Resource Matchmaking**: Recommends optimal allocation of ambulances, fire engines, and rescue teams per staging hub.
+- **Spatial Centroid Optimization**: Uses K-Means++ initialization with spherical Haversine distance calculations to establish optimal staging hubs and relief camp locations.
 
 ### 🌲 4. Decision Tree Severity Classifier (`js/ai/decision-tree.js`)
-- **START Triage Protocol**: Multi-factor classification into 5 severity levels based on magnitude, population affected, infrastructure damage, and weather conditions.
+- **START Triage Protocol**: Multi-factor classification into 5 severity levels (L1 Minimal to L5 Critical) based on magnitude, population affected, and infrastructure damage.
 
 ### 📈 5. Monte Carlo Risk Simulator (`js/ai/monte-carlo.js`)
-- **Probabilistic Disaster Propagation**: Runs 1,000 cellular automata iterations combining environmental noise to predict wildfire fronts, flood inundation, and earthquake shaking heatmaps.
+- **Probabilistic Disaster Propagation**: Runs 500 stochastic cellular automata iterations to predict wildfire fronts, flood inundation, and earthquake shaking heatmaps.
+
+### 🤖 6. Neural Network Damage Predictor (`js/ai/neural-net.js`)
+- **Feed-Forward ML Predictor**: 2-layer Neural Network predicting non-linear casualty estimates and financial loss based on magnitude, wind, population, and infrastructure vulnerability.
 
 ---
 
-## 🎨 UI & Command Center Capabilities
+## 🌐 Real-Time External APIs & Enterprise Features
 
-- **Interactive GIS Command Map**: Leaflet.js map layer with live incident markers, hazard circles, evacuation corridors, and AI staging hubs.
-- **5 Pre-Built Disaster Scenarios**:
-  - 🌀 **Cat 4 Hurricane** (Chennai Coast)
-  - 🌋 **M7.2 Earthquake** (Uttarakhand Fault Line)
-  - 🔥 **Multi-Front Wildfire** (Nilgiris / Western Ghats)
-  - 🌊 **Flash Flood Emergency** (Assam Brahmaputra Valley)
-  - ☣️ **Industrial Chemical Leak** (Jamnagar Petrochemical Complex)
-- **Real-Time Data Simulator**: Live updates for weather telemetry, seismic events, dispatch communications, and fleet fuel levels every 2.5 seconds.
-- **Analytics Suite**: Dynamic Chart.js line charts, resource distribution doughnuts, severity histograms, and threat radar charts.
+- **Open-Meteo REST API**: Fetches real live weather telemetry (wind speed, rain, temp, humidity) for scenario GPS coordinates (Chennai, Uttarakhand, Assam, Jamnagar).
+- **OASIS CAP v1.2 Export**: One-click generation and export of official NDRF Common Alerting Protocol JSON alert dispatches.
+- **PWA Mobile App Support**: Offline-capable Progressive Web App with `manifest.json` and `service-worker.js` for mobile responder smartphones.
+- **2D/3D GIS Command Map**: Toggle between 2D Tactical Map and 3D Tactical Perspective Map.
+- **Light & Dark Theme Switcher**: Full custom CSS variable theme engine with map tile adaptation and chart color syncing.
+
+---
+
+## 📄 Project Documentation Links
+
+- 📄 **[Real-World Operational Workflow Document](real_world_operational_workflow.html)**
+- 📘 **[Capstone Project Final Report](capstone_project_final_report.html)**
+- 🎓 **[Viva Q&A Cheat Sheet](viva_qa_cheatsheet.html)**
+- 📊 **[Presentation Slides Outline](presentation_slides_outline.html)**
 
 ---
 
 ## 🚀 Getting Started
 
-### Prerequisites
-No complex installation required! All core dependencies (Leaflet.js, Chart.js) are included via CDN.
-
 ### Running Locally
 
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/<YOUR-USERNAME>/disaster-platform.git
-   cd disaster-platform
-   ```
+```bash
+# Clone repository
+git clone https://github.com/aryy005/capstone-project.git
+cd capstone-project
 
-2. **Start a local static web server:**
-
-   *Using Python:*
-   ```bash
-   python -m http.server 8080
-   ```
-
-   *Using Node.js (`npx http-server`):*
-   ```bash
-   npx http-server -p 8080
-   ```
-
-3. **Open in Browser:**
-   Navigate to `http://localhost:8080` in your web browser.
+# Start local server on port 8080
+npx -y http-server -p 8080 -c-1 --cors
+```
+Open **`http://localhost:8080`** in your web browser!
 
 ---
 
-## 📂 Project Architecture
-
-```
-disaster-platform/
-├── index.html              # Main HTML Shell & View Containers
-├── README.md               # Documentation
-├── css/
-│   ├── index.css           # Design System & Design Tokens
-│   ├── dashboard.css       # KPI & Panel Layout Styles
-│   ├── map.css             # Leaflet & GIS Overlay Styles
-│   └── components.css      # Toasts, Modals, Resources & Comms
-└── js/
-    ├── app.js              # Application Controller
-    ├── ai/
-    │   ├── bayesian.js     # Bayesian Threat Network
-    │   ├── astar.js        # A* Evacuation Pathfinding
-    │   ├── kmeans.js       # K-Means Resource Clustering
-    │   ├── decision-tree.js # START Protocol Severity Triage
-    │   └── monte-carlo.js  # Monte Carlo Spread Simulator
-    ├── data/
-    │   ├── simulator.js    # Real-Time Telemetry Data Generator
-    │   └── scenarios.js    # Pre-built Disaster Scenarios
-    ├── components/
-    │   ├── alerts.js       # Toast & Modal Notification System
-    │   ├── dashboard.js    # Dashboard UI Renderer
-    │   ├── map-manager.js  # Leaflet Map Manager
-    │   ├── resources.js    # Fleet & Asset Management
-    │   ├── comms.js        # Live Radio & Dispatch Feed
-    │   └── charts.js       # Chart.js Visualizations
-    └── utils/
-        ├── constants.js    # System Configurations
-        └── helpers.js      # Haversine Distance & Math Helpers
-```
-
----
-
-## 📄 License
-
-Distributed under the MIT License. See `LICENSE` for more information.
+## 🎓 Phase 2 Roadmap
+1. **YOLOv8 Aerial Computer Vision**: Automated survivor and damage detection from drone feeds.
+2. **Whisper Speech-to-Text**: Multilingual regional Indian emergency call processing.
+3. **NDMA / NDRF Live API Sync**: Direct server-to-server alert integration.
+4. **Offline Mesh Networking**: Peer-to-peer responder communication in zero-cell-coverage zones.

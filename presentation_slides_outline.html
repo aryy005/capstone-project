@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AEGIS — Capstone Presentation Slides Outline</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+    
+    @page { size: A4; margin: 20mm; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f8fafc;
+      color: #0f172a;
+      line-height: 1.6;
+      padding: 40px;
+    }
+
+    .no-print-bar {
+      position: fixed; top: 0; left: 0; right: 0;
+      background: #0f172a; color: #ffffff;
+      padding: 12px 24px; display: flex; align-items: center; justify-content: space-between;
+      z-index: 9999; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .no-print-bar button {
+      background: #0284c7; color: white; border: none; padding: 8px 18px;
+      border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 14px;
+    }
+    .no-print-bar button:hover { background: #0369a1; }
+
+    @media print {
+      .no-print-bar { display: none !important; }
+      body { padding: 0; background: #ffffff; }
+      .page-break { page-break-before: always; }
+    }
+
+    .doc-container {
+      max-width: 800px; margin: 50px auto 0 auto; background: #ffffff;
+      padding: 48px; border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+      border: 1px solid #e2e8f0;
+    }
+
+    .header-block { border-bottom: 3px solid #0284c7; padding-bottom: 24px; margin-bottom: 32px; }
+    .header-badge { display: inline-block; background: #e0f2fe; color: #0369a1; font-size: 11px; font-weight: 700; letter-spacing: 1px; padding: 4px 10px; border-radius: 4px; text-transform: uppercase; margin-bottom: 12px; }
+    h1 { font-size: 26px; font-weight: 800; color: #0f172a; line-height: 1.3; }
+    .subtitle { font-size: 14px; color: #475569; margin-top: 6px; }
+
+    .slide-card {
+      background: #f8fafc; border: 1px solid #cbd5e1; border-left: 4px solid #0284c7;
+      border-radius: 8px; padding: 20px; margin-bottom: 20px;
+    }
+    .slide-num { font-size: 11px; font-weight: 800; color: #0284c7; text-transform: uppercase; letter-spacing: 1px; }
+    .slide-title { font-size: 16px; font-weight: 700; color: #0f172a; margin: 4px 0 10px 0; }
+    ul { padding-left: 20px; }
+    li { font-size: 13px; color: #334155; margin-bottom: 4px; }
+  </style>
+</head>
+<body>
+
+  <div class="no-print-bar">
+    <div><strong>AEGIS Presentation Deck Outline</strong> — Ready for PDF Download</div>
+    <button onclick="window.print()">🖨️ Download / Save as PDF</button>
+  </div>
+
+  <div class="doc-container">
+    <div class="header-block">
+      <span class="header-badge">Presentation Structure</span>
+      <h1>AEGIS — 10-Slide Capstone Phase 1 Presentation Deck</h1>
+      <div class="subtitle">Recommended slide-by-slide structure for Capstone Evaluation</div>
+    </div>
+
+    <div class="slide-card">
+      <div class="slide-num">Slide 1</div>
+      <div class="slide-title">Title Slide</div>
+      <ul>
+        <li><strong>Project Title:</strong> AEGIS — AI Enabled Emergency Response &amp; Disaster Management Platform</li>
+        <li><strong>Domain:</strong> Artificial Intelligence &amp; Emergency Management Systems</li>
+        <li><strong>Key Highlights:</strong> 6 AI Engines, Live Weather REST API, 2D/3D GIS Command Map, NDRF CAP Export</li>
+      </ul>
+    </div>
+
+    <div class="slide-card">
+      <div class="slide-num">Slide 2</div>
+      <div class="slide-title">Problem Statement &amp; Motivation</div>
+      <ul>
+        <li>High response latencies during major Indian disasters (Hurricanes, Earthquakes, Floods).</li>
+        <li>Lack of automated triage, hazard spread prediction, and optimal evacuation route computation.</li>
+        <li>Incompatibility between local emergency logs and standardized national (NDRF / CAP) alerts.</li>
+      </ul>
+    </div>
+
+    <div class="slide-card">
+      <div class="slide-num">Slide 3</div>
+      <div class="slide-title">System Architecture Overview</div>
+      <ul>
+        <li>Single-Page Application (SPA) architecture built with Vanilla JS, HTML5 &amp; CSS3.</li>
+        <li>Real-time telemetry integration with Open-Meteo Weather API.</li>
+        <li>PWA Service Worker offline caching for responder mobile smartphones.</li>
+      </ul>
+    </div>
+
+    <div class="slide-card">
+      <div class="slide-num">Slide 4</div>
+      <div class="slide-title">The 6 Core AI Algorithmic Modules</div>
+      <ul>
+        <li><strong>Bayesian Network:</strong> Posterior threat likelihood <code>P(Disaster|Telemetry)</code>.</li>
+        <li><strong>A* Router:</strong> Evacuation route optimization with dynamic hazard cost weighting.</li>
+        <li><strong>K-Means++ Clustering:</strong> Haversine spatial staging hub centroids.</li>
+        <li><strong>Decision Tree Classifier:</strong> START protocol severity triage (L1 - L5).</li>
+        <li><strong>Monte Carlo Simulator:</strong> 500-run stochastic cellular disaster spread prediction.</li>
+        <li><strong>Neural Network Predictor:</strong> Feed-forward non-linear casualty &amp; damage model.</li>
+      </ul>
+    </div>
+
+    <div class="slide-card">
+      <div class="slide-num">Slide 5</div>
+      <div class="slide-title">GIS Command Center &amp; 3D Perspective</div>
+      <ul>
+        <li>Interactive Leaflet.js 2D GIS map displaying live incidents, fleet locations &amp; danger zones.</li>
+        <li>High-performance 3D Tactical Perspective mode with elevated marker drop-shadows.</li>
+        <li>5 regional scenarios (Chennai Hurricane, Uttarakhand Earthquake, Nilgiris Wildfire, Assam Flood, Jamnagar Chemical Spill).</li>
+      </ul>
+    </div>
+
+    <div class="slide-card">
+      <div class="slide-num">Slide 6</div>
+      <div class="slide-title">Real-Time Operational Workflow</div>
+      <ul>
+        <li>6-step lifecycle: Detection ➔ AI Triage ➔ Spread Risk ➔ Route Optimization ➔ NDRF CAP Dispatch ➔ 3D Map Tracking.</li>
+      </ul>
+    </div>
+
+    <div class="slide-card">
+      <div class="slide-num">Slide 7</div>
+      <div class="slide-title">NDRF CAP v1.2 Standard Alert Integration</div>
+      <ul>
+        <li>OASIS Common Alerting Protocol compliant JSON/XML alert payload generation.</li>
+        <li>One-click export for National Disaster Response Force battalion servers.</li>
+      </ul>
+    </div>
+
+    <div class="slide-card">
+      <div class="slide-num">Slide 8</div>
+      <div class="slide-title">Experimental Results &amp; Performance</div>
+      <ul>
+        <li>60 FPS GIS map rendering &amp; instantaneous AI inference (&lt; 50ms execution time).</li>
+        <li>Zero framework bundle overhead for low-spec emergency command hardware.</li>
+      </ul>
+    </div>
+
+    <div class="slide-card">
+      <div class="slide-num">Slide 9</div>
+      <div class="slide-title">Phase 2 Development Roadmap</div>
+      <ul>
+        <li>YOLOv8 Aerial Computer Vision for drone damage analytics.</li>
+        <li>Whisper NLP Speech-to-Text for 112 emergency calls.</li>
+        <li>NDMA Sachet live server synchronization.</li>
+        <li>Offline Bluetooth LE / Wi-Fi Direct mesh networking.</li>
+      </ul>
+    </div>
+
+    <div class="slide-card">
+      <div class="slide-num">Slide 10</div>
+      <div class="slide-title">Conclusion &amp; Q&amp;A</div>
+      <ul>
+        <li>Summary of Phase 1 deliverables and platform readiness.</li>
+        <li>Open for Evaluator Questions &amp; System Demonstration.</li>
+      </ul>
+    </div>
+
+    <div style="margin-top: 40px; border-top: 1px solid #e2e8f0; padding-top: 16px; font-size: 11px; color: #64748b; text-align: center;">
+      AEGIS AI Platform • Presentation Outline • Capstone Final Documentation
+    </div>
+  </div>
+
+</body>
+</html>
