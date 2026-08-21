@@ -9,6 +9,8 @@ window.DP.MapManager = class {
     this.hazardCircles = [];
     this.stagingMarkers = [];
     this.heatmapLayer = null;
+    this.is3DMode = false;
+    this.cesiumViewer = null;
     this.layers = {
       incidents: true,
       resources: true,
@@ -68,7 +70,77 @@ window.DP.MapManager = class {
   }
 
   setCenter(center, zoom = 11) {
+    this._pendingCenter = center;
     if (this.map) this.map.setView(center, zoom, { animate: true, duration: 1 });
+    if (this.is3DMode && this.cesiumViewer && window.Cesium) {
+      this.cesiumViewer.camera.flyTo({
+        destination: window.Cesium.Cartesian3.fromDegrees(center[1], center[0], 25000)
+      });
+    }
+  }
+
+  toggle3DMode() {
+    this.is3DMode = !this.is3DMode;
+    const btn = document.getElementById('btn-toggle-3d');
+    const leafletMap = document.getElementById('map');
+    const cesiumContainer = document.getElementById('cesiumContainer');
+
+    if (this.is3DMode) {
+      if (btn) btn.innerHTML = '<span class="map-ctrl-icon">🗺️</span> Switch to 2D Map Mode';
+      if (leafletMap) leafletMap.style.display = 'none';
+      if (cesiumContainer) cesiumContainer.style.display = 'block';
+
+      this.initCesium3DGlobe();
+    } else {
+      if (btn) btn.innerHTML = '<span class="map-ctrl-icon">🌐</span> Switch to 3D Globe Mode';
+      if (cesiumContainer) cesiumContainer.style.display = 'none';
+      if (leafletMap) leafletMap.style.display = 'block';
+      if (this.map) this.map.invalidateSize();
+    }
+  }
+
+  initCesium3DGlobe() {
+    const cesiumContainer = document.getElementById('cesiumContainer');
+    if (!cesiumContainer) return;
+
+    if (!this.cesiumViewer && window.Cesium) {
+      try {
+        this.cesiumViewer = new window.Cesium.Viewer('cesiumContainer', {
+          animation: false,
+          baseLayerPicker: false,
+          fullscreenButton: false,
+          geocoder: false,
+          homeButton: false,
+          infoBox: false,
+          sceneModePicker: false,
+          selectionIndicator: false,
+          timeline: false,
+          navigationHelpButton: false
+        });
+
+        const center = this._pendingCenter || window.DP.CONSTANTS.MAP.DEFAULT_CENTER;
+        this.cesiumViewer.camera.flyTo({
+          destination: window.Cesium.Cartesian3.fromDegrees(center[1], center[0], 25000),
+          orientation: {
+            heading: window.Cesium.Math.toRadians(0.0),
+            pitch: window.Cesium.Math.toRadians(-45.0),
+            roll: 0.0
+          }
+        });
+      } catch (e) {
+        console.warn('Cesium 3D Viewer fallback mode:', e);
+      }
+    } else if (this.cesiumViewer && window.Cesium) {
+      const center = this._pendingCenter || window.DP.CONSTANTS.MAP.DEFAULT_CENTER;
+      this.cesiumViewer.camera.flyTo({
+        destination: window.Cesium.Cartesian3.fromDegrees(center[1], center[0], 25000),
+        orientation: {
+          heading: window.Cesium.Math.toRadians(0.0),
+          pitch: window.Cesium.Math.toRadians(-45.0),
+          roll: 0.0
+        }
+      });
+    }
   }
 
   render(data) {

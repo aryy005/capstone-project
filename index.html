@@ -15,6 +15,9 @@
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
+  <!-- Cesium 3D Globe Engine CSS -->
+  <link href="https://cesium.com/downloads/cesiumjs/releases/1.115/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+
   <!-- PWA Manifest -->
   <link rel="manifest" href="manifest.json">
 
@@ -285,11 +288,15 @@
         </div>
 
         <!-- 2. GIS MAP VIEW -->
-        <div id="map-view" class="view-container" style="display: none; overflow: hidden;">
-          <div id="map"></div>
+        <div id="map-view" class="view-container" style="display: none; overflow: hidden; position: relative;">
+          <div id="map" style="width:100%; height:100%;"></div>
+          <div id="cesiumContainer" style="display: none; width:100%; height:100%; position: absolute; inset: 0; z-index: 2;"></div>
 
           <div class="map-controls">
             <div class="map-control-group">
+              <button class="map-ctrl-btn active" id="btn-toggle-3d" onclick="window.DP.App.ui.map.toggle3DMode()" style="background: linear-gradient(135deg, #818cf8, #38bdf8); color: #070a14; font-weight: 700;">
+                <span class="map-ctrl-icon">🌐</span> Switch to 3D Globe Mode
+              </button>
               <button class="map-ctrl-btn active" onclick="window.DP.App.ui.map.toggleLayer('incidents')">
                 <span class="map-ctrl-icon">🚨</span> Incidents Layer
               </button>
@@ -536,6 +543,7 @@
 
   <!-- CDN JS Libraries -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cesium.com/downloads/cesiumjs/releases/1.115/Build/Cesium/Cesium.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <!-- Application Utilities & Constants -->
