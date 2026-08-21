@@ -3,9 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AEGIS — AI Emergency Response & Disaster Management Platform</title>
+  <title>AEGIS — AI Emergency Response &amp; Disaster Management Platform</title>
+  <meta name="description" content="AEGIS: AI-powered real-time Emergency Response and Disaster Management Platform using Bayesian Inference, A* Pathfinding, K-Means++, Decision Tree, and Monte Carlo simulation.">
+  <meta name="keywords" content="AI, Emergency Response, Disaster Management, Bayesian Network, A-Star, K-Means, Monte Carlo">
 
-  <!-- Google Fonts & CDN Libraries -->
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -13,13 +15,44 @@
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
-  <!-- App CSS Files -->
+  <!-- App CSS -->
   <link rel="stylesheet" href="css/index.css">
+  <link rel="stylesheet" href="css/splash.css">
   <link rel="stylesheet" href="css/dashboard.css">
   <link rel="stylesheet" href="css/map.css">
   <link rel="stylesheet" href="css/components.css">
 </head>
 <body>
+
+  <!-- ===== SPLASH SCREEN ===== -->
+  <div id="splash-screen">
+    <div class="splash-ring">
+      <div class="splash-logo-icon">🚨</div>
+    </div>
+
+    <div class="splash-title">AEGIS</div>
+    <div class="splash-subtitle">AI Emergency Guardian &amp; Intelligence System</div>
+    <div class="splash-description">AI-Enabled Emergency Response &amp; Disaster Management Platform</div>
+
+    <div class="splash-loader-wrap">
+      <div class="splash-loader-label">
+        <span id="splash-status">Initializing AI Modules...</span>
+        <span id="splash-pct">0%</span>
+      </div>
+      <div class="splash-loader-bar">
+        <div class="splash-loader-fill"></div>
+      </div>
+    </div>
+
+    <div class="splash-modules">
+      <span class="splash-module-tag" id="sm-bayesian">Bayesian Network</span>
+      <span class="splash-module-tag" id="sm-astar">A* Router</span>
+      <span class="splash-module-tag" id="sm-kmeans">K-Means++</span>
+      <span class="splash-module-tag" id="sm-dtree">Decision Tree</span>
+      <span class="splash-module-tag" id="sm-monte">Monte Carlo</span>
+      <span class="splash-module-tag" id="sm-gis">GIS Engine</span>
+    </div>
+  </div>
 
   <div id="app">
 
@@ -41,32 +74,32 @@
       <nav class="sidebar-nav">
         <div class="nav-section">
           <div class="nav-section-title">Command Views</div>
-          <div class="nav-item active" data-view="dashboard">
+          <div class="nav-item active" data-view="dashboard" id="nav-dashboard">
             <span class="nav-icon">📊</span>
             <span>Dashboard</span>
           </div>
-          <div class="nav-item" data-view="map">
+          <div class="nav-item" data-view="map" id="nav-map">
             <span class="nav-icon">🗺️</span>
             <span>GIS Map Command</span>
             <span class="nav-badge" id="alert-badge"></span>
           </div>
-          <div class="nav-item" data-view="resources">
+          <div class="nav-item" data-view="resources" id="nav-resources">
             <span class="nav-icon">📦</span>
             <span>Resource Fleet</span>
           </div>
-          <div class="nav-item" data-view="comms">
+          <div class="nav-item" data-view="comms" id="nav-comms">
             <span class="nav-icon">📡</span>
-            <span>Comms & Dispatch</span>
+            <span>Comms &amp; Dispatch</span>
           </div>
         </div>
 
         <div class="nav-section">
-          <div class="nav-section-title">Analytics & Intelligence</div>
-          <div class="nav-item" data-view="analytics">
+          <div class="nav-section-title">Analytics &amp; Intelligence</div>
+          <div class="nav-item" data-view="analytics" id="nav-analytics">
             <span class="nav-icon">📈</span>
             <span>Predictive Analytics</span>
           </div>
-          <div class="nav-item" data-view="ai">
+          <div class="nav-item" data-view="ai" id="nav-ai">
             <span class="nav-icon">🧠</span>
             <span>AI Algorithmic Engine</span>
           </div>
@@ -84,7 +117,7 @@
 
       <div class="sidebar-clock">
         <div id="clock-time">00:00:00</div>
-        <div class="sidebar-date" id="clock-date">Aug 07, 2026</div>
+        <div class="sidebar-date" id="clock-date">Aug 21, 2026</div>
       </div>
     </aside>
 
@@ -125,35 +158,35 @@
 
           <!-- KPI ROW -->
           <div class="kpi-row">
-            <div class="kpi-card" style="--kpi-color: var(--critical);">
+            <div class="kpi-card clickable" style="--kpi-color: var(--critical); cursor: pointer;" onclick="window.DP.App.ui.dashboard.showActiveIncidentsModal()" title="Click to view all active incidents">
               <div class="kpi-icon">🚨</div>
               <div class="kpi-value" id="kpi-active-incidents">0</div>
               <div class="kpi-label">Active Incidents</div>
-              <div class="kpi-trend up">▲ 2 new</div>
+              <div class="kpi-trend up">▲ View Active List</div>
             </div>
 
-            <div class="kpi-card" style="--kpi-color: var(--high);">
+            <div class="kpi-card clickable" style="--kpi-color: var(--high); cursor: pointer;" onclick="window.DP.App.ui.dashboard.showActiveIncidentsModal()" title="Click to view active incidents impact">
               <div class="kpi-icon">👥</div>
               <div class="kpi-value" id="kpi-affected-pop">0</div>
               <div class="kpi-label">Population Affected</div>
               <div class="kpi-trend up">▲ In risk zones</div>
             </div>
 
-            <div class="kpi-card" style="--kpi-color: var(--low);">
+            <div class="kpi-card clickable" style="--kpi-color: var(--low); cursor: pointer;" onclick="window.DP.App.switchView('resources')" title="Click to view resource fleet">
               <div class="kpi-icon">🚑</div>
               <div class="kpi-value" id="kpi-deployed-resources">0</div>
               <div class="kpi-label">Deployed Resources</div>
-              <div class="kpi-trend down">▼ Active fleet</div>
+              <div class="kpi-trend down">▼ View Fleet</div>
             </div>
 
-            <div class="kpi-card" style="--kpi-color: var(--accent-primary);">
+            <div class="kpi-card clickable" style="--kpi-color: var(--accent-primary); cursor: pointer;" onclick="window.DP.App.switchView('map')" title="Click to view GIS map corridors">
               <div class="kpi-icon">🛣️</div>
               <div class="kpi-value">A* Active</div>
               <div class="kpi-label">Evacuation Corridors</div>
               <div class="kpi-trend down">● Clear paths</div>
             </div>
 
-            <div class="kpi-card" style="--kpi-color: var(--accent-secondary);">
+            <div class="kpi-card clickable" style="--kpi-color: var(--accent-secondary); cursor: pointer;" onclick="window.DP.App.switchView('map')" title="Click to view staging hubs">
               <div class="kpi-icon">⛺</div>
               <div class="kpi-value">K-Means</div>
               <div class="kpi-label">Staging Hubs</div>
@@ -166,14 +199,15 @@
 
             <!-- Incidents Panel -->
             <div class="panel" id="incident-panel">
-              <div class="panel-header">
+              <div class="panel-header" style="display: flex; align-items: center; justify-content: space-between;">
                 <div class="panel-title">
                   <span class="icon">🔥</span> Live Incident Command Queue
                 </div>
+                <button class="btn btn-sm btn-primary" onclick="window.DP.App.ui.dashboard.showActiveIncidentsModal()">
+                  View All Active Incidents 🚨
+                </button>
               </div>
-              <div class="panel-body" id="incident-list-container">
-                <!-- Rendered dynamically -->
-              </div>
+              <div class="panel-body" id="incident-list-container"></div>
             </div>
 
             <!-- Threat Panel -->
@@ -200,9 +234,7 @@
 
                 <div class="threat-breakdown">
                   <div class="threat-breakdown-title">Multi-Hazard Probabilities</div>
-                  <div id="threat-breakdown-container">
-                    <!-- Rendered dynamically -->
-                  </div>
+                  <div id="threat-breakdown-container"></div>
                 </div>
               </div>
             </div>
@@ -216,18 +248,14 @@
               <div class="panel-header">
                 <div class="panel-title"><span class="icon">💡</span> AI Neural Insights</div>
               </div>
-              <div class="panel-body" id="ai-insights-container">
-                <!-- Rendered dynamically -->
-              </div>
+              <div class="panel-body" id="ai-insights-container"></div>
             </div>
 
             <div class="panel">
               <div class="panel-header">
                 <div class="panel-title"><span class="icon">🌡️</span> Sensor Telemetry</div>
               </div>
-              <div class="panel-body" id="weather-grid-container">
-                <!-- Rendered dynamically -->
-              </div>
+              <div class="panel-body" id="weather-grid-container"></div>
             </div>
 
             <div class="panel">
@@ -244,7 +272,7 @@
         </div>
 
         <!-- 2. GIS MAP VIEW -->
-        <div id="map-view" class="view-container" style="display: none;">
+        <div id="map-view" class="view-container" style="display: none; overflow: hidden;">
           <div id="map"></div>
 
           <div class="map-controls">
@@ -269,14 +297,10 @@
         </div>
 
         <!-- 3. RESOURCES VIEW -->
-        <div id="resources-view" class="view-container" style="display: none;">
-          <!-- Rendered dynamically -->
-        </div>
+        <div id="resources-view" class="view-container" style="display: none;"></div>
 
         <!-- 4. COMMS VIEW -->
-        <div id="comms-view" class="view-container" style="display: none;">
-          <!-- Rendered dynamically -->
-        </div>
+        <div id="comms-view" class="view-container" style="display: none;"></div>
 
         <!-- 5. ANALYTICS VIEW -->
         <div id="analytics-view" class="view-container" style="display: none;">
@@ -294,6 +318,11 @@
             <div class="chart-card">
               <div class="chart-card-title">🎯 Multi-Hazard Threat Radar</div>
               <canvas id="chart-threat-radar"></canvas>
+            </div>
+
+            <div class="chart-card">
+              <div class="chart-card-title">📈 Monte Carlo Convergence — Spread Probability</div>
+              <canvas id="chart-monte-carlo"></canvas>
             </div>
           </div>
         </div>
@@ -320,6 +349,14 @@
                   <span class="metric-label">Evidence Variables</span>
                   <span class="metric-value">Wind, Rain, Seismic, Temp, Humidity</span>
                 </div>
+                <div class="metric-row">
+                  <span class="metric-label">Disaster Classes</span>
+                  <span class="metric-value">7 Types (Hurricane → Tornado)</span>
+                </div>
+                <div class="metric-row">
+                  <span class="metric-label">Live Score</span>
+                  <span class="metric-value" id="ai-card-bayesian-score">—</span>
+                </div>
               </div>
             </div>
 
@@ -331,15 +368,19 @@
               <div class="ai-card-body">
                 <div class="metric-row">
                   <span class="metric-label">Grid Resolution</span>
-                  <span class="metric-value">50 x 50 Cells</span>
+                  <span class="metric-value">50 × 50 Cells</span>
+                </div>
+                <div class="metric-row">
+                  <span class="metric-label">Heuristic</span>
+                  <span class="metric-value">Euclidean Distance</span>
                 </div>
                 <div class="metric-row">
                   <span class="metric-label">Dynamic Hazard Penalty</span>
-                  <span class="metric-value">W(e) = Dist * (1 + 1000 * Risk)</span>
+                  <span class="metric-value">W(e) = Dist × (1 + 1000 × Risk)</span>
                 </div>
                 <div class="metric-row">
-                  <span class="metric-label">Path Smoothing</span>
-                  <span class="metric-value">Euclidean Distance Heuristic</span>
+                  <span class="metric-label">Routes Generated</span>
+                  <span class="metric-value" id="ai-card-astar-routes">—</span>
                 </div>
               </div>
             </div>
@@ -351,12 +392,45 @@
               </div>
               <div class="ai-card-body">
                 <div class="metric-row">
-                  <span class="metric-label">Centroid Optimization</span>
-                  <span class="metric-value">K-Means++ Initialization</span>
+                  <span class="metric-label">Initialization</span>
+                  <span class="metric-value">K-Means++ Seeding</span>
                 </div>
                 <div class="metric-row">
                   <span class="metric-label">Optimal K Selection</span>
                   <span class="metric-value">Elbow Method Detection</span>
+                </div>
+                <div class="metric-row">
+                  <span class="metric-label">Distance Metric</span>
+                  <span class="metric-value">Haversine (Spherical Earth)</span>
+                </div>
+                <div class="metric-row">
+                  <span class="metric-label">Active Clusters</span>
+                  <span class="metric-value" id="ai-card-kmeans-clusters">—</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="ai-card">
+              <div class="ai-card-header">
+                <span class="ai-card-title">🌲 Decision Tree Severity Classifier</span>
+                <span class="ai-card-algo">START Triage Protocol</span>
+              </div>
+              <div class="ai-card-body">
+                <div class="metric-row">
+                  <span class="metric-label">Classification Levels</span>
+                  <span class="metric-value">5 Severity Classes</span>
+                </div>
+                <div class="metric-row">
+                  <span class="metric-label">Input Features</span>
+                  <span class="metric-value">Magnitude, Population, Infrastructure, Weather</span>
+                </div>
+                <div class="metric-row">
+                  <span class="metric-label">Avg Severity Score</span>
+                  <span class="metric-value" id="ai-card-dtree-avg">—</span>
+                </div>
+                <div class="metric-row">
+                  <span class="metric-label">Total Classified</span>
+                  <span class="metric-value" id="ai-card-dtree-total">—</span>
                 </div>
               </div>
             </div>
@@ -364,7 +438,7 @@
             <div class="ai-card">
               <div class="ai-card-header">
                 <span class="ai-card-title">📈 Monte Carlo Risk Simulator</span>
-                <span class="ai-card-algo">1000 Stochastic Iterations</span>
+                <span class="ai-card-algo">500 Stochastic Iterations</span>
               </div>
               <div class="ai-card-body">
                 <div class="metric-row">
@@ -373,7 +447,15 @@
                 </div>
                 <div class="metric-row">
                   <span class="metric-label">Simulated Models</span>
-                  <span class="metric-value">Wildfire, Flood Inundation, Shaking</span>
+                  <span class="metric-value">Wildfire, Flood Inundation, Earthquake Shaking</span>
+                </div>
+                <div class="metric-row">
+                  <span class="metric-label">Grid Cells</span>
+                  <span class="metric-value">40 × 40 (1,600 cells)</span>
+                </div>
+                <div class="metric-row">
+                  <span class="metric-label">Peak Spread Probability</span>
+                  <span class="metric-value" id="ai-card-monte-prob">—</span>
                 </div>
               </div>
             </div>
@@ -394,7 +476,7 @@
         <div class="critical-modal-title">CRITICAL EMERGENCY</div>
         <div class="critical-modal-body">Category 5 Severe Alert triggered. Immediate evacuation and response required.</div>
         <div class="critical-modal-actions">
-          <button class="btn btn-danger" onclick="window.DP.App.alerts.closeCriticalModal()">Acknowledge & Dismiss</button>
+          <button class="btn btn-danger" onclick="window.DP.App.alerts.closeCriticalModal()">Acknowledge &amp; Dismiss</button>
         </div>
       </div>
     </div>
@@ -430,6 +512,42 @@
 
   <!-- Main App Controller -->
   <script src="js/app.js"></script>
+
+  <!-- Splash Screen Controller -->
+  <script>
+    (function() {
+      const modules = [
+        { id: 'sm-bayesian', label: 'Initializing Bayesian Network...', delay: 200 },
+        { id: 'sm-astar',    label: 'Loading A* Router...',             delay: 550 },
+        { id: 'sm-kmeans',   label: 'Loading K-Means++ Engine...',      delay: 850 },
+        { id: 'sm-dtree',    label: 'Building Decision Tree...',        delay: 1150 },
+        { id: 'sm-monte',    label: 'Starting Monte Carlo Simulator...', delay: 1450 },
+        { id: 'sm-gis',      label: 'Initializing GIS Map Engine...',   delay: 1750 }
+      ];
+      const statusEl = document.getElementById('splash-status');
+      const pctEl    = document.getElementById('splash-pct');
+      const pcts = [10, 25, 42, 60, 76, 92];
+
+      modules.forEach((m, i) => {
+        setTimeout(() => {
+          const el = document.getElementById(m.id);
+          if (el) el.classList.add('loaded');
+          if (statusEl) statusEl.textContent = m.label;
+          if (pctEl) pctEl.textContent = pcts[i] + '%';
+        }, m.delay);
+      });
+
+      setTimeout(() => {
+        if (statusEl) statusEl.textContent = 'System Ready.';
+        if (pctEl) pctEl.textContent = '100%';
+        setTimeout(() => {
+          const splash = document.getElementById('splash-screen');
+          if (splash) splash.classList.add('fade-out');
+          setTimeout(() => { if (splash) splash.style.display = 'none'; }, 700);
+        }, 350);
+      }, 2050);
+    })();
+  </script>
 
 </body>
 </html>

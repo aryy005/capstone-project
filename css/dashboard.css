@@ -1,26 +1,22 @@
 /* ===== DASHBOARD LAYOUT ===== */
 #dashboard-view {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  padding: var(--sp-lg);
-  gap: var(--sp-md);
-  overflow: hidden;
+  display: block;
+  padding: 16px;
 }
 
 /* ===== KPI ROW ===== */
 .kpi-row {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: var(--sp-md);
-  flex-shrink: 0;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 12px;
+  margin-bottom: 14px;
 }
 
 .kpi-card {
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--r-lg);
-  padding: var(--sp-lg);
+  padding: 14px;
   position: relative;
   overflow: hidden;
   transition: border-color 0.3s, box-shadow 0.3s;
@@ -43,18 +39,19 @@
   background: var(--kpi-color, var(--accent-primary));
   opacity: 0.06;
 }
-.kpi-icon  { font-size: 22px; margin-bottom: 6px; }
+.kpi-icon  { font-size: 20px; margin-bottom: 4px; }
 .kpi-value {
-  font-size: 28px; font-weight: 800; line-height: 1;
+  font-size: 20px; font-weight: 800; line-height: 1.2;
   color: var(--text-primary); font-variant-numeric: tabular-nums;
+  word-break: break-word;
 }
 .kpi-label {
-  font-size: 10px; font-weight: 600; letter-spacing: 1px;
-  text-transform: uppercase; color: var(--text-muted); margin-top: 4px;
+  font-size: 9px; font-weight: 600; letter-spacing: 0.8px;
+  text-transform: uppercase; color: var(--text-muted); margin-top: 3px;
 }
 .kpi-trend {
   display: flex; align-items: center; gap: 4px;
-  font-size: 11px; font-weight: 600; margin-top: 6px;
+  font-size: 10px; font-weight: 600; margin-top: 4px;
 }
 .kpi-trend.up   { color: var(--critical); }
 .kpi-trend.down { color: var(--low); }
@@ -66,19 +63,19 @@
 /* ===== MIDDLE ROW ===== */
 .dashboard-middle {
   display: grid;
-  grid-template-columns: 1fr 280px;
-  gap: var(--sp-md);
-  flex: 1;
-  min-height: 0;
+  grid-template-columns: 1fr 260px;
+  gap: 12px;
+  min-height: 320px;
+  margin-bottom: 14px;
 }
 
 /* ===== INCIDENT LIST ===== */
-#incident-panel { display: flex; flex-direction: column; }
-#incident-panel .panel-body { flex: 1; overflow-y: auto; }
+#incident-panel { display: flex; flex-direction: column; min-height: 300px; }
+#incident-panel .panel-body { flex: 1; overflow-y: auto; max-height: 400px; }
 
 .incident-item {
-  display: flex; align-items: flex-start; gap: var(--sp-md);
-  padding: 10px var(--sp-lg);
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 10px 14px;
   border-bottom: 1px solid var(--border);
   cursor: pointer;
   transition: background 0.15s;
@@ -94,7 +91,7 @@
 .incident-icon { font-size: 20px; flex-shrink: 0; margin-top: 2px; }
 .incident-info { flex: 1; min-width: 0; }
 .incident-title { font-size: 12px; font-weight: 600; color: var(--text-primary); }
-.incident-meta  { display: flex; gap: var(--sp-sm); align-items: center; margin-top: 4px; flex-wrap: wrap; }
+.incident-meta  { display: flex; gap: 6px; align-items: center; margin-top: 4px; flex-wrap: wrap; }
 .incident-time  { font-size: 10px; color: var(--text-muted); }
 .incident-pop   { font-size: 10px; color: var(--text-secondary); }
 .incident-status-col { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
@@ -115,15 +112,15 @@
 
 /* ===== THREAT PANEL (right) ===== */
 #threat-panel { display: flex; flex-direction: column; }
-#threat-panel .panel-body { flex: 1; padding: var(--sp-lg); overflow-y: auto; }
+#threat-panel .panel-body { flex: 1; padding: 14px; overflow-y: auto; }
 
 .threat-ring-container {
   display: flex; flex-direction: column; align-items: center;
-  padding-bottom: var(--sp-lg);
+  padding-bottom: 14px;
 }
 .threat-ring-wrap {
   position: relative; width: 130px; height: 130px;
-  margin-bottom: var(--sp-md);
+  margin-bottom: 10px;
 }
 .threat-ring-wrap svg { transform: rotate(-90deg); }
 .threat-ring-bg { fill: none; stroke: rgba(255,255,255,0.06); stroke-width: 10; }
@@ -141,10 +138,10 @@
   border: 1px solid currentColor;
 }
 
-.threat-breakdown { margin-top: var(--sp-lg); }
+.threat-breakdown { margin-top: 14px; }
 .threat-breakdown-title { font-size: 10px; font-weight: 700; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
 .threat-row {
-  display: flex; align-items: center; gap: var(--sp-sm);
+  display: flex; align-items: center; gap: 6px;
   margin-bottom: 8px;
 }
 .threat-row-icon   { font-size: 14px; width: 20px; text-align: center; flex-shrink: 0; }
@@ -155,17 +152,40 @@
 /* ===== BOTTOM ROW ===== */
 .dashboard-bottom {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: var(--sp-md);
-  height: 180px;
-  flex-shrink: 0;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
 }
-.dashboard-bottom .panel { display: flex; flex-direction: column; }
-.dashboard-bottom .panel .panel-body { flex: 1; padding: var(--sp-md); overflow: hidden; }
+.dashboard-bottom .panel { display: flex; flex-direction: column; min-height: 180px; }
+.dashboard-bottom .panel .panel-body { flex: 1; padding: 10px; overflow: hidden; }
+
+/* ===== ANALYTICS CHARTS GRID (2x2) ===== */
+.charts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  padding: 16px;
+}
+.chart-card {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 280px;
+  box-shadow: var(--shadow-panel);
+}
+.chart-card-title {
+  font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 1.5px;
+  color: var(--text-secondary); flex-shrink: 0;
+}
+.chart-card canvas { flex: 1; min-height: 220px; }
 
 /* AI insights panel */
 .ai-insight {
-  display: flex; align-items: flex-start; gap: var(--sp-sm);
+  display: flex; align-items: flex-start; gap: 6px;
   padding: 7px; background: rgba(124,77,255,0.06); border-radius: var(--r-md);
   border: 1px solid rgba(124,77,255,0.15); margin-bottom: 6px; animation: fadeInUp 0.3s ease;
 }
@@ -174,7 +194,7 @@
 .ai-insight-text strong { color: var(--text-accent); }
 
 /* Weather widget */
-.weather-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-sm); }
+.weather-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
 .weather-item { background: rgba(255,255,255,0.03); border-radius: var(--r-md); padding: 8px; border: 1px solid var(--border); }
 .weather-item-label { font-size: 9px; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; }
 .weather-item-value { font-size: 16px; font-weight: 700; margin-top: 2px; }

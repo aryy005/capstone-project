@@ -184,7 +184,7 @@ body {
 .sidebar-date { font-family: var(--font); font-size: 10px; color: var(--text-muted); text-align: center; padding-bottom: var(--sp-md); letter-spacing: 1px; }
 
 /* ===== MAIN AREA ===== */
-#main { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+#main { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; min-height: 0; }
 
 /* ===== TOPBAR ===== */
 #topbar {
@@ -240,7 +240,24 @@ body {
 @keyframes tickerFlash { 0%,100%{opacity:1} 50%{opacity:0.7} }
 
 /* ===== CONTENT ===== */
-#content { flex: 1; overflow: hidden; display: flex; }
+#content {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+/* View containers */
+.view-container {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Map fills its container exactly — no scroll */
+#map-view { overflow: hidden; }
 
 /* ===== PANELS ===== */
 .panel {
@@ -350,3 +367,10 @@ body {
 .gap-md { gap: var(--sp-md); }
 .flex-1 { flex: 1; }
 .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ===== CUSTOM SCROLLBAR ===== */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(0,212,255,0.3); }
+* { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.1) transparent; }

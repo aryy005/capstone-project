@@ -20,7 +20,19 @@ window.DP.MapManager = class {
   }
 
   init(containerId = 'map', center = window.DP.CONSTANTS.MAP.DEFAULT_CENTER, zoom = window.DP.CONSTANTS.MAP.DEFAULT_ZOOM) {
+    // Store params for lazy init — Leaflet MUST be initialized when container is visible
+    this._pendingCenter = center;
+    this._pendingZoom   = zoom;
+    this._containerId   = containerId;
+    // Don't call L.map() here — container is hidden (display:none) so Leaflet gets 0 height
+  }
+
+  // Called the first time the map view becomes visible
+  ensureInit() {
     if (this.map) return;
+    const containerId = this._containerId || 'map';
+    const center      = this._pendingCenter || window.DP.CONSTANTS.MAP.DEFAULT_CENTER;
+    const zoom        = this._pendingZoom   || window.DP.CONSTANTS.MAP.DEFAULT_ZOOM;
 
     this.map = L.map(containerId, {
       center,
@@ -31,7 +43,7 @@ window.DP.MapManager = class {
 
     L.tileLayer(window.DP.CONSTANTS.MAP.TILE_URL, {
       attribution: window.DP.CONSTANTS.MAP.TILE_ATTRIBUTION,
-      maxZoom: window.DP.CONSTANTS.MAP.MAX_ZOOM
+      maxZoom:     window.DP.CONSTANTS.MAP.MAX_ZOOM
     }).addTo(this.map);
   }
 
