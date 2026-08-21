@@ -42,15 +42,6 @@
 
 ---
 
-## 📄 Project Documentation Links
-
-- 📄 **[Real-World Operational Workflow Document](real_world_operational_workflow.html)**
-- 📘 **[Capstone Project Final Report](capstone_project_final_report.html)**
-- 🎓 **[Viva Q&A Cheat Sheet](viva_qa_cheatsheet.html)**
-- 📊 **[Presentation Slides Outline](presentation_slides_outline.html)**
-
----
-
 ## 🚀 Getting Started
 
 ### Running Locally
