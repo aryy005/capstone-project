@@ -103,9 +103,18 @@ window.DP.MapManager = class {
     const cesiumContainer = document.getElementById('cesiumContainer');
     if (!cesiumContainer) return;
 
+    const center = this._pendingCenter || window.DP.CONSTANTS.MAP.DEFAULT_CENTER;
+
     if (!this.cesiumViewer && window.Cesium) {
       try {
+        // Use OSM imagery provider so no Ion token is needed and terrain/earth imagery loads 100% reliably!
+        const osmProvider = new window.Cesium.UrlTemplateImageryProvider({
+          url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+          maximumLevel: 19
+        });
+
         this.cesiumViewer = new window.Cesium.Viewer('cesiumContainer', {
+          imageryProvider: osmProvider,
           animation: false,
           baseLayerPicker: false,
           fullscreenButton: false,
@@ -115,32 +124,68 @@ window.DP.MapManager = class {
           sceneModePicker: false,
           selectionIndicator: false,
           timeline: false,
-          navigationHelpButton: false
+          navigationHelpButton: false,
+          scene3DOnly: true
         });
 
-        const center = this._pendingCenter || window.DP.CONSTANTS.MAP.DEFAULT_CENTER;
+        if (this.cesiumViewer.creditDisplay) {
+          this.cesiumViewer.creditDisplay.container.style.display = 'none';
+        }
+
         this.cesiumViewer.camera.flyTo({
-          destination: window.Cesium.Cartesian3.fromDegrees(center[1], center[0], 25000),
+          destination: window.Cesium.Cartesian3.fromDegrees(center[1], center[0], 35000),
           orientation: {
             heading: window.Cesium.Math.toRadians(0.0),
-            pitch: window.Cesium.Math.toRadians(-45.0),
+            pitch: window.Cesium.Math.toRadians(-65.0),
             roll: 0.0
-          }
+          },
+          duration: 1.5
         });
+
+        this.renderCesium3DEntities();
+
       } catch (e) {
         console.warn('Cesium 3D Viewer fallback mode:', e);
       }
     } else if (this.cesiumViewer && window.Cesium) {
-      const center = this._pendingCenter || window.DP.CONSTANTS.MAP.DEFAULT_CENTER;
       this.cesiumViewer.camera.flyTo({
-        destination: window.Cesium.Cartesian3.fromDegrees(center[1], center[0], 25000),
+        destination: window.Cesium.Cartesian3.fromDegrees(center[1], center[0], 35000),
         orientation: {
           heading: window.Cesium.Math.toRadians(0.0),
-          pitch: window.Cesium.Math.toRadians(-45.0),
+          pitch: window.Cesium.Math.toRadians(-65.0),
           roll: 0.0
+        },
+        duration: 1.5
+      });
+      this.renderCesium3DEntities();
+    }
+  }
+
+  renderCesium3DEntities() {
+    if (!this.cesiumViewer || !window.Cesium) return;
+    this.cesiumViewer.entities.removeAll();
+
+    const incidents = window.DP.App?.simulator?.incidents || [];
+    incidents.forEach(inc => {
+      const color = inc.severity >= 4 ? window.Cesium.Color.RED : window.Cesium.Color.CYAN;
+      this.cesiumViewer.entities.add({
+        position: window.Cesium.Cartesian3.fromDegrees(inc.lng, inc.lat, 100),
+        point: {
+          pixelSize: 14,
+          color: color,
+          outlineColor: window.Cesium.Color.WHITE,
+          outlineWidth: 2
+        },
+        label: {
+          text: `🚨 ${inc.title} (L${inc.severity})`,
+          font: '13px sans-serif',
+          style: window.Cesium.LabelStyle.FILL_AND_OUTLINE,
+          outlineWidth: 2,
+          verticalOrigin: window.Cesium.VerticalOrigin.BOTTOM,
+          pixelOffset: new window.Cesium.Cartesian2(0, -15)
         }
       });
-    }
+    });
   }
 
   render(data) {
