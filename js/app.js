@@ -261,10 +261,10 @@ class Application {
       el.style.display = 'none';
     });
 
-    // Show selected view — home, dashboard and map use flex, others use block
+    // Show selected view — dashboard and map use flex, others use block
     const target = document.getElementById(`${viewId}-view`);
     if (target) {
-      const flexViews = ['home', 'dashboard', 'map'];
+      const flexViews = ['dashboard', 'map'];
       target.style.display = flexViews.includes(viewId) ? 'flex' : 'block';
     }
 
