@@ -247,7 +247,7 @@ window.DP.DashboardComponent = class {
 
     // Threat Ring SVG
     if (this.elements.threatRingFill) {
-      const circumference = 2 * Math.PI * 55;
+      const circumference = 2 * Math.PI * 52;
       this.elements.threatRingFill.style.strokeDasharray  = `${circumference} ${circumference}`;
       this.elements.threatRingFill.style.strokeDashoffset = circumference - (threatLevel * circumference);
       this.elements.threatRingFill.style.stroke = window.DP.Helpers.severityColor(threatLevel);

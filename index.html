@@ -170,41 +170,65 @@
         <!-- 1. DASHBOARD VIEW -->
         <div id="dashboard-view" class="view-container" style="display: flex;">
 
+          <!-- HERO MISSION COMMAND STRIP -->
+          <div class="command-hero-banner">
+            <div class="hero-info">
+              <span class="hero-tag">● DEFCON 2 — LIVE COMMAND MATRIX</span>
+              <div class="hero-title" id="hero-scenario-title">Cat 4 Hurricane Response Protocol</div>
+              <div class="hero-subtitle">Real-time Bayesian threat modeling, A* evacuation pathfinding, and K-Means staging hubs engaged</div>
+            </div>
+            <div class="hero-actions">
+              <button class="btn btn-primary" onclick="window.DP.App.ui.dashboard.showActiveIncidentsModal()">
+                <span>🚨 Active Command Queue</span>
+              </button>
+            </div>
+          </div>
+
           <!-- KPI ROW -->
           <div class="kpi-row">
-            <div class="kpi-card clickable" style="--kpi-color: var(--critical); cursor: pointer;" onclick="window.DP.App.ui.dashboard.showActiveIncidentsModal()" title="Click to view all active incidents">
-              <div class="kpi-icon">🚨</div>
+            <div class="kpi-card clickable" style="--kpi-color: var(--critical);" onclick="window.DP.App.ui.dashboard.showActiveIncidentsModal()" title="Click to view all active incidents">
+              <div class="kpi-top">
+                <div class="kpi-icon">🚨</div>
+                <div class="kpi-trend up">▲ Live List</div>
+              </div>
               <div class="kpi-value" id="kpi-active-incidents">0</div>
               <div class="kpi-label">Active Incidents</div>
-              <div class="kpi-trend up">▲ View Active List</div>
             </div>
 
-            <div class="kpi-card clickable" style="--kpi-color: var(--high); cursor: pointer;" onclick="window.DP.App.ui.dashboard.showActiveIncidentsModal()" title="Click to view active incidents impact">
-              <div class="kpi-icon">👥</div>
+            <div class="kpi-card clickable" style="--kpi-color: var(--high);" onclick="window.DP.App.ui.dashboard.showActiveIncidentsModal()" title="Click to view active incidents impact">
+              <div class="kpi-top">
+                <div class="kpi-icon">👥</div>
+                <div class="kpi-trend up">▲ At Risk</div>
+              </div>
               <div class="kpi-value" id="kpi-affected-pop">0</div>
               <div class="kpi-label">Population Affected</div>
-              <div class="kpi-trend up">▲ In risk zones</div>
             </div>
 
-            <div class="kpi-card clickable" style="--kpi-color: var(--low); cursor: pointer;" onclick="window.DP.App.switchView('resources')" title="Click to view resource fleet">
-              <div class="kpi-icon">🚑</div>
+            <div class="kpi-card clickable" style="--kpi-color: var(--low);" onclick="window.DP.App.switchView('resources')" title="Click to view resource fleet">
+              <div class="kpi-top">
+                <div class="kpi-icon">🚑</div>
+                <div class="kpi-trend down">● 100% Deployed</div>
+              </div>
               <div class="kpi-value" id="kpi-deployed-resources">0</div>
               <div class="kpi-label">Deployed Resources</div>
-              <div class="kpi-trend down">▼ View Fleet</div>
             </div>
 
-            <div class="kpi-card clickable" style="--kpi-color: var(--accent-primary); cursor: pointer;" onclick="window.DP.App.switchView('map')" title="Click to view GIS map corridors">
-              <div class="kpi-icon">🛣️</div>
-              <div class="kpi-value">A* Active</div>
+            <div class="kpi-card clickable" style="--kpi-color: var(--accent-primary);" onclick="window.DP.App.switchView('map')" title="Click to view GIS map corridors">
+              <div class="kpi-top">
+                <div class="kpi-icon">🛣️</div>
+                <div class="kpi-trend neutral">● Dynamic Cost</div>
+              </div>
+              <div class="kpi-value">A* Router</div>
               <div class="kpi-label">Evacuation Corridors</div>
-              <div class="kpi-trend down">● Clear paths</div>
             </div>
 
-            <div class="kpi-card clickable" style="--kpi-color: var(--accent-secondary); cursor: pointer;" onclick="window.DP.App.switchView('map')" title="Click to view staging hubs">
-              <div class="kpi-icon">⛺</div>
-              <div class="kpi-value">K-Means</div>
-              <div class="kpi-label">Staging Hubs</div>
-              <div class="kpi-trend down">● Centroid optimized</div>
+            <div class="kpi-card clickable" style="--kpi-color: var(--accent-secondary);" onclick="window.DP.App.switchView('map')" title="Click to view staging hubs">
+              <div class="kpi-top">
+                <div class="kpi-icon">⛺</div>
+                <div class="kpi-trend neutral">● Centroid Hubs</div>
+              </div>
+              <div class="kpi-value">K-Means++</div>
+              <div class="kpi-label">Staging Relief Hubs</div>
             </div>
           </div>
 
@@ -213,12 +237,12 @@
 
             <!-- Incidents Panel -->
             <div class="panel" id="incident-panel">
-              <div class="panel-header" style="display: flex; align-items: center; justify-content: space-between;">
+              <div class="panel-header">
                 <div class="panel-title">
                   <span class="icon">🔥</span> Live Incident Command Queue
                 </div>
-                <button class="btn btn-sm btn-primary" onclick="window.DP.App.ui.dashboard.showActiveIncidentsModal()">
-                  View All Active Incidents 🚨
+                <button class="btn btn-primary" style="font-size: 11px; padding: 4px 10px;" onclick="window.DP.App.ui.dashboard.showActiveIncidentsModal()">
+                  View Full List 🚨
                 </button>
               </div>
               <div class="panel-body" id="incident-list-container"></div>
@@ -228,26 +252,27 @@
             <div class="panel" id="threat-panel">
               <div class="panel-header">
                 <div class="panel-title">
-                  <span class="icon">🧠</span> Bayesian Assessment
+                  <span class="icon">🧠</span> Bayesian Threat Assessment
                 </div>
+                <div class="badge badge-high" id="threat-level-badge">HIGH RISK</div>
               </div>
               <div class="panel-body">
-                <div class="threat-ring-container">
-                  <div class="threat-ring-wrap">
-                    <svg width="130" height="130" viewBox="0 0 130 130">
-                      <circle class="threat-ring-bg" cx="65" cy="65" r="55" />
-                      <circle class="threat-ring-fill" id="threat-ring-fill" cx="65" cy="65" r="55" />
-                    </svg>
-                    <div class="threat-ring-label">
-                      <div class="threat-ring-pct" id="threat-ring-pct">0%</div>
-                      <div class="threat-ring-text">THREAT SCORE</div>
-                    </div>
+                <div class="threat-center-box">
+                  <svg class="threat-svg-ring" viewBox="0 0 130 130">
+                    <circle class="threat-ring-bg" cx="65" cy="65" r="52" />
+                    <circle class="threat-ring-val" id="threat-ring-fill" cx="65" cy="65" r="52" stroke-dasharray="326.7" stroke-dashoffset="100" />
+                  </svg>
+                  <div class="threat-ring-text">
+                    <div class="threat-ring-score" id="threat-ring-pct">0%</div>
+                    <div class="threat-ring-sub">THREAT INDEX</div>
                   </div>
-                  <div class="threat-level-badge badge-high" id="threat-level-badge">HIGH</div>
                 </div>
 
-                <div class="threat-breakdown">
-                  <div class="threat-breakdown-title">Multi-Hazard Probabilities</div>
+                <div class="threat-probs">
+                  <div class="threat-prob-header">
+                    <span>Multi-Hazard Assessment</span>
+                    <span>Probability</span>
+                  </div>
                   <div id="threat-breakdown-container"></div>
                 </div>
               </div>
@@ -267,20 +292,9 @@
 
             <div class="panel">
               <div class="panel-header">
-                <div class="panel-title"><span class="icon">🌡️</span> Sensor Telemetry</div>
+                <div class="panel-title"><span class="icon">🌡️</span> Real-Time Weather Telemetry</div>
               </div>
               <div class="panel-body" id="weather-grid-container"></div>
-            </div>
-
-            <div class="panel">
-              <div class="panel-header">
-                <div class="panel-title"><span class="icon">📊</span> Severity Distribution</div>
-              </div>
-              <div class="panel-body">
-                <div class="chart-wrapper">
-                  <canvas id="chart-severity-distribution"></canvas>
-                </div>
-              </div>
             </div>
 
           </div>
