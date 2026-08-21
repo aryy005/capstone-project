@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AEGIS — Real-World Operational Workflow & Response Architecture</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+    
+    @page {
+      size: A4;
+      margin: 20mm;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f8fafc;
+      color: #0f172a;
+      line-height: 1.6;
+      padding: 40px;
+    }
+
+    .no-print-bar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      background: #0f172a;
+      color: #ffffff;
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 9999;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .no-print-bar button {
+      background: #0284c7;
+      color: white;
+      border: none;
+      padding: 8px 18px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .no-print-bar button:hover { background: #0369a1; }
+
+    @media print {
+      .no-print-bar { display: none !important; }
+      body { padding: 0; background: #ffffff; }
+      .page-break { page-break-before: always; }
+    }
+
+    .doc-container {
+      max-width: 800px;
+      margin: 50px auto 0 auto;
+      background: #ffffff;
+      padding: 48px;
+      border-radius: 12px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+      border: 1px solid #e2e8f0;
+    }
+
+    .header-block {
+      border-bottom: 3px solid #0284c7;
+      padding-bottom: 24px;
+      margin-bottom: 32px;
+    }
+    .header-badge {
+      display: inline-block;
+      background: #e0f2fe;
+      color: #0369a1;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      padding: 4px 10px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    h1 { font-size: 26px; font-weight: 800; color: #0f172a; line-height: 1.3; }
+    .subtitle { font-size: 14px; color: #475569; margin-top: 6px; }
+
+    h2 { font-size: 18px; font-weight: 700; color: #0f172a; margin: 32px 0 16px 0; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; }
+    h3 { font-size: 15px; font-weight: 600; color: #0369a1; margin: 20px 0 8px 0; }
+    p, li { font-size: 13px; color: #334155; line-height: 1.7; }
+    ul, ol { padding-left: 20px; margin-bottom: 16px; }
+    li { margin-bottom: 6px; }
+
+    .workflow-diagram {
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 24px 0;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: #0f172a;
+      text-align: center;
+      line-height: 1.8;
+    }
+
+    .step-card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-left: 4px solid #0284c7;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .step-number { font-size: 11px; font-weight: 800; color: #0284c7; text-transform: uppercase; letter-spacing: 1px; }
+    .step-title { font-size: 16px; font-weight: 700; color: #0f172a; margin: 4px 0 10px 0; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 12px;
+    }
+    th, td {
+      border: 1px solid #cbd5e1;
+      padding: 10px 14px;
+      text-align: left;
+    }
+    th { background: #f1f5f9; font-weight: 700; color: #0f172a; }
+
+    code { font-family: 'JetBrains Mono', monospace; background: #e2e8f0; padding: 2px 6px; border-radius: 4px; font-size: 11px; }
+  </style>
+</head>
+<body>
+
+  <div class="no-print-bar">
+    <div><strong>AEGIS Operational Workflow Document</strong> — Ready for PDF Download</div>
+    <button onclick="window.print()">🖨️ Download / Save as PDF</button>
+  </div>
+
+  <div class="doc-container">
+    <div class="header-block">
+      <span class="header-badge">Operational Standard Architecture</span>
+      <h1>AEGIS — Real-World Operational Workflow & Response Protocols</h1>
+      <div class="subtitle">AI-Enabled Emergency Response &amp; Disaster Management Platform</div>
+    </div>
+
+    <h2>1. Executive Operational Flow Diagram</h2>
+    <div class="workflow-diagram">
+      [ 1. Incident Ingestion &amp; Live Weather API ]<br>
+      👇<br>
+      [ 2. AI Decision Tree Severity Triage (L1 - L5) ]<br>
+      👇<br>
+      [ 3. Bayesian Threat Inference &amp; Monte Carlo Spread ]<br>
+      👇<br>
+      [ 4. K-Means Staging Hubs &amp; A* Evacuation Corridors ]<br>
+      👇<br>
+      [ 5. OASIS CAP v1.2 Alert Dispatch &amp; PWA Push Alert ]<br>
+      👇<br>
+      [ 6. Live 2D/3D GIS Command Map Tracking &amp; Field Resolution ]
+    </div>
+
+    <h2>2. End-to-End Operational Lifecycle (6 Steps)</h2>
+
+    <div class="step-card">
+      <div class="step-number">Step 1</div>
+      <div class="step-title">Disaster Event Detection &amp; Ingestion</div>
+      <p>Emergency events enter the AEGIS Command Center through two continuous pipelines:</p>
+      <ul>
+        <li><strong>Live Environmental Telemetry:</strong> Automatic REST polling from Open-Meteo &amp; IMD weather APIs for wind speed, rainfall, temperature, and humidity.</li>
+        <li><strong>Citizen &amp; Field Ingestion:</strong> Emergency calls, mobile responder reports, and satellite coordinates logging exact GPS location, disaster type, and population density.</li>
+      </ul>
+    </div>
+
+    <div class="step-card">
+      <div class="step-number">Step 2</div>
+      <div class="step-title">AI Automated Triage &amp; Severity Scoring</div>
+      <p>Every incoming report is classified instantaneously by the <strong>Decision Tree START Triage Model</strong>:</p>
+      <ul>
+        <li><strong>Level 1 - Level 2 (Minimal / Low):</strong> Assigned to local municipal responders.</li>
+        <li><strong>Level 3 (Moderate):</strong> Standard district-level emergency response.</li>
+        <li><strong>Level 4 - Level 5 (High / Critical):</strong> Triggers automated multi-agency alerts, NDRF mobilization, and mandatory evacuation advisories.</li>
+      </ul>
+    </div>
+
+    <div class="step-card">
+      <div class="step-number">Step 3</div>
+      <div class="step-title">Real-Time Threat &amp; Risk Simulation</div>
+      <p>Before dispatching rescue teams, dual AI engines evaluate secondary hazards:</p>
+      <ul>
+        <li><strong>Bayesian Network:</strong> Computes posterior probabilities for secondary hazards (e.g., coastal flooding triggering structural collapses or landslide risk).</li>
+        <li><strong>Monte Carlo Simulator:</strong> Runs 500 stochastic iterations across a 1,600-cell grid to project disaster spread over the next 6 to 24 hours.</li>
+      </ul>
+    </div>
+
+    <div class="step-card">
+      <div class="step-number">Step 4</div>
+      <div class="step-title">Resource Clustering &amp; Safe Evacuation Routing</div>
+      <p>The platform optimizes ground logistics:</p>
+      <ul>
+        <li><strong>K-Means++ Clustering:</strong> Calculates optimal geographical centroids for setting up Relief Camps &amp; Staging Hubs across active incident clusters.</li>
+        <li><strong>A* Pathfinding Router:</strong> Dynamically calculates clear evacuation corridors for rescue trucks while avoiding active danger zones.</li>
+      </ul>
+    </div>
+
+    <div class="step-card">
+      <div class="step-number">Step 5</div>
+      <div class="step-title">Emergency Dispatch &amp; Team Alerting</div>
+      <p>Rescue teams are alerted via standardized protocols:</p>
+      <ul>
+        <li><strong>OASIS CAP v1.2 Format:</strong> Standardized Common Alerting Protocol JSON/XML payloads formatted for National Disaster Response Force (NDRF) servers.</li>
+        <li><strong>PWA Mobile Push Alerts:</strong> Real-time dispatch alerts delivered to field responder smartphones with route navigation.</li>
+      </ul>
+    </div>
+
+    <div class="step-card">
+      <div class="step-number">Step 6</div>
+      <div class="step-title">Live 2D/3D Tactical Monitoring &amp; Resolution</div>
+      <p>Command operators track rescue units (ambulances, fire engines, helicopters) live on the 2D / 3D Tactical Perspective GIS Command Map. Field teams update status progression: <code>ACTIVE ➔ DEPLOYED ➔ CONTAINED ➔ RESOLVED</code>.</p>
+    </div>
+
+    <h2>3. Incident Triage Standard Matrix</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Severity Level</th>
+          <th>Triage Label</th>
+          <th>Response Time Target</th>
+          <th>Required Deployment</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Level 5</strong></td>
+          <td><span style="color:#dc2626; font-weight:700;">CRITICAL</span></td>
+          <td>&lt; 15 minutes</td>
+          <td>NDRF Battalion, Air Support, Mobile Medical Units</td>
+        </tr>
+        <tr>
+          <td><strong>Level 4</strong></td>
+          <td><span style="color:#ea580c; font-weight:700;">HIGH</span></td>
+          <td>&lt; 30 minutes</td>
+          <td>State Disaster Response Force (SDRF), Fire Fleet</td>
+        </tr>
+        <tr>
+          <td><strong>Level 3</strong></td>
+          <td><span style="color:#d97706; font-weight:700;">MODERATE</span></td>
+          <td>&lt; 60 minutes</td>
+          <td>District Emergency Units, Police Patrols</td>
+        </tr>
+        <tr>
+          <td><strong>Level 1 - 2</strong></td>
+          <td><span style="color:#16a34a; font-weight:700;">LOW / MINIMAL</span></td>
+          <td>&lt; 120 minutes</td>
+          <td>Local Municipal Services</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div style="margin-top: 40px; border-top: 1px solid #e2e8f0; padding-top: 16px; font-size: 11px; color: #64748b; text-align: center;">
+      AEGIS AI Platform • Operational Response Workflow • Final Capstone Documentation
+    </div>
+  </div>
+
+</body>
+</html>

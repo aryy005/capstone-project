@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AEGIS — Capstone Project Final Comprehensive Report</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+    
+    @page {
+      size: A4;
+      margin: 20mm;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f8fafc;
+      color: #0f172a;
+      line-height: 1.6;
+      padding: 40px;
+    }
+
+    .no-print-bar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      background: #0f172a;
+      color: #ffffff;
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 9999;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .no-print-bar button {
+      background: #0284c7;
+      color: white;
+      border: none;
+      padding: 8px 18px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .no-print-bar button:hover { background: #0369a1; }
+
+    @media print {
+      .no-print-bar { display: none !important; }
+      body { padding: 0; background: #ffffff; }
+      .page-break { page-break-before: always; }
+    }
+
+    .doc-container {
+      max-width: 800px;
+      margin: 50px auto 0 auto;
+      background: #ffffff;
+      padding: 48px;
+      border-radius: 12px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+      border: 1px solid #e2e8f0;
+    }
+
+    .header-block {
+      border-bottom: 3px solid #0284c7;
+      padding-bottom: 24px;
+      margin-bottom: 32px;
+    }
+    .header-badge {
+      display: inline-block;
+      background: #e0f2fe;
+      color: #0369a1;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      padding: 4px 10px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    h1 { font-size: 26px; font-weight: 800; color: #0f172a; line-height: 1.3; }
+    .subtitle { font-size: 14px; color: #475569; margin-top: 6px; }
+
+    h2 { font-size: 18px; font-weight: 700; color: #0f172a; margin: 32px 0 16px 0; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; }
+    h3 { font-size: 15px; font-weight: 600; color: #0369a1; margin: 20px 0 8px 0; }
+    p, li { font-size: 13px; color: #334155; line-height: 1.7; }
+    ul, ol { padding-left: 20px; margin-bottom: 16px; }
+    li { margin-bottom: 6px; }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 20px 0;
+    }
+    .card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 16px;
+    }
+    .card-title { font-size: 13px; font-weight: 700; color: #0f172a; margin-bottom: 6px; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 12px;
+    }
+    th, td {
+      border: 1px solid #cbd5e1;
+      padding: 10px 14px;
+      text-align: left;
+    }
+    th { background: #f1f5f9; font-weight: 700; color: #0f172a; }
+
+    code { font-family: 'JetBrains Mono', monospace; background: #e2e8f0; padding: 2px 6px; border-radius: 4px; font-size: 11px; }
+  </style>
+</head>
+<body>
+
+  <div class="no-print-bar">
+    <div><strong>AEGIS Capstone Final Report Document</strong> — Ready for PDF Download</div>
+    <button onclick="window.print()">🖨️ Download / Save as PDF</button>
+  </div>
+
+  <div class="doc-container">
+    <div class="header-block">
+      <span class="header-badge">Capstone Final Project Report</span>
+      <h1>AEGIS — AI Enabled Emergency Response &amp; Disaster Management Platform</h1>
+      <div class="subtitle">Final Technical Architecture, AI Algorithms &amp; Implementation Report</div>
+    </div>
+
+    <h2>1. Executive Summary &amp; Abstract</h2>
+    <p>
+      Natural disasters cause devastating human and economic losses due to delayed emergency response coordination. <strong>AEGIS</strong> is an end-to-end, AI-powered emergency management platform designed to automate disaster triage, predict hazard spread, calculate safe evacuation corridors, optimize rescue staging hubs, and broadcast standardized alerts to response agencies.
+    </p>
+
+    <h2>2. Technical Architecture &amp; System Stack</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Component</th>
+          <th>Technology Stack</th>
+          <th>Functionality</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Frontend Core</strong></td>
+          <td>HTML5, JavaScript (ES6+), Vanilla CSS3</td>
+          <td>Single-page command center UI with responsive dark/light glassmorphism</td>
+        </tr>
+        <tr>
+          <td><strong>GIS Mapping Engine</strong></td>
+          <td>Leaflet.js + CartoDB tiles + 3D Tactical Perspective</td>
+          <td>Interactive 2D &amp; 3D perspective spatial map displaying incidents, fleets &amp; hazards</td>
+        </tr>
+        <tr>
+          <td><strong>Live External APIs</strong></td>
+          <td>Open-Meteo REST API</td>
+          <td>Live real-time weather telemetry polling (wind, rain, temp, humidity)</td>
+        </tr>
+        <tr>
+          <td><strong>Alert Protocol</strong></td>
+          <td>OASIS CAP v1.2 Standard (JSON / XML)</td>
+          <td>Standardized NDRF Emergency Dispatch payload generation and export</td>
+        </tr>
+        <tr>
+          <td><strong>Mobile / PWA</strong></td>
+          <td>Web Manifest &amp; Service Workers</td>
+          <td>Installable offline-first mobile app for field responder smartphones</td>
+        </tr>
+        <tr>
+          <td><strong>Data Visualization</strong></td>
+          <td>Chart.js v4.4</td>
+          <td>Rolling incident trajectory, fleet distribution, radar &amp; Monte Carlo convergence</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="page-break"></div>
+
+    <h2>3. The 6 Integrated AI Algorithmic Modules</h2>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">1. Bayesian Threat Inference</div>
+        <p>Calculates posterior disaster probabilities using recursive Bayes theorem <code>P(Disaster|Evidence)</code> based on live environmental sensor telemetry.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-title">2. A* Pathfinding Evacuation Router</div>
+        <p>Computes optimal dynamic evacuation corridors using cost function <code>f(n) = g(n) + h(n)</code> with penalty weight <code>W(e) = Dist × (1 + 1000 × Risk)</code>.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-title">3. K-Means++ Resource Clustering</div>
+        <p>Calculates spatial centroids using spherical Haversine distance to establish optimal staging hubs and relief camp locations.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-title">4. Decision Tree START Severity Triage</div>
+        <p>Classifies incoming emergency incidents into 5 severity levels (L1 Minimal to L5 Critical) based on magnitude and population affected.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-title">5. Monte Carlo Stochastic Risk Simulator</div>
+        <p>Executes 500 stochastic simulation iterations across a 1,600-cell grid to project disaster spread probabilities over 24-hour windows.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-title">6. Neural Network Damage Predictor</div>
+        <p>2-layer feed-forward neural network with Sigmoid activation layers predicting casualty estimates and monetary loss.</p>
+      </div>
+    </div>
+
+    <h2>4. Proposed Phase 2 Development Roadmap</h2>
+    <ul>
+      <li><strong>YOLOv8 Computer Vision:</strong> Aerial drone footage analysis for automated survivor and structural damage detection.</li>
+      <li><strong>Whisper NLP Speech-to-Text:</strong> Regional Indian language 112 emergency call ingestion and automated GPS parsing.</li>
+      <li><strong>NDMA / NDRF Live API Integration:</strong> Direct two-way alert synchronization with NDMA Sachet alert servers.</li>
+      <li><strong>Offline Mesh Networking:</strong> Peer-to-peer Bluetooth LE / Wi-Fi Direct sync for field teams operating in zero-cellular zones.</li>
+    </ul>
+
+    <div style="margin-top: 40px; border-top: 1px solid #e2e8f0; padding-top: 16px; font-size: 11px; color: #64748b; text-align: center;">
+      AEGIS AI Platform • Capstone Project Final Documentation
+    </div>
+  </div>
+
+</body>
+</html>
