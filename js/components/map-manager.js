@@ -106,6 +106,13 @@ window.DP.MapManager = class {
     if (this.layers.hazards && scenario?.hazardZones) this.renderHazards(scenario.hazardZones);
     if (this.layers.routes && ai?.astar) this.renderEvacuationCorridors(ai.astar.routes);
     if (this.layers.staging && ai?.kmeans) this.renderStagingAreas(ai.kmeans.clusters);
+
+    // Refresh heatmap if active
+    if (this.layers.heatmap && this.heatmapLayer) {
+      this.map.removeLayer(this.heatmapLayer);
+      this.heatmapLayer = null;
+      this.toggleHeatmap(incidents);
+    }
   }
 
   renderIncidents(incidents) {
@@ -276,6 +283,27 @@ window.DP.MapManager = class {
   clearStaging() {
     this.stagingMarkers.forEach(m => this.map.removeLayer(m));
     this.stagingMarkers = [];
+  }
+
+  toggleHeatmap(incidents) {
+    this.layers.heatmap = !this.layers.heatmap;
+    const btn = document.getElementById('btn-toggle-heatmap');
+
+    if (!this.layers.heatmap) {
+      if (this.heatmapLayer) { this.map.removeLayer(this.heatmapLayer); this.heatmapLayer = null; }
+      if (btn) { btn.classList.remove('active'); btn.style.background = ''; }
+      return;
+    }
+
+    if (!window.L.heatLayer) { console.warn('Leaflet.heat not loaded'); return; }
+    const points = (incidents || []).map(inc => [
+      inc.lat, inc.lng, (inc.severity || 1) / 5
+    ]);
+    this.heatmapLayer = L.heatLayer(points, {
+      radius: 35, blur: 20, maxZoom: 14,
+      gradient: { 0.2: '#00e676', 0.5: '#ffd600', 0.8: '#ff6d00', 1.0: '#ff1744' }
+    }).addTo(this.map);
+    if (btn) { btn.classList.add('active'); btn.style.background = 'rgba(255,23,68,0.2)'; }
   }
 
   toggleLayer(layerName, state) {

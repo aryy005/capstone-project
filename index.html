@@ -34,6 +34,7 @@
   <div id="splash-screen" style="display: none !important;"></div>
 
   <div id="app">
+    <div id="sidebar-overlay" onclick="window.DP.App.toggleSidebar()"></div>
 
     <!-- ===== SIDEBAR ===== -->
     <aside id="sidebar">
@@ -78,6 +79,10 @@
             <span class="nav-icon">🧠</span>
             <span>AI Intelligence</span>
           </div>
+          <div class="nav-item" data-view="timeline" id="nav-timeline">
+            <span class="nav-icon">🕒</span>
+            <span>Event Timeline</span>
+          </div>
         </div>
 
         <div class="nav-section">
@@ -121,6 +126,9 @@
 
       <!-- TOPBAR -->
       <header id="topbar">
+        <button id="sidebar-toggle-btn" class="btn" onclick="window.DP.App.toggleSidebar()" title="Toggle Sidebar" style="display:none; padding:0; width:34px; height:34px; min-width:34px; align-items:center; justify-content:center;">
+          <span style="font-size:18px;">☰</span>
+        </button>
         <div class="topbar-title">
           AEGIS Command — <span>Emergency Operations</span>
         </div>
@@ -145,6 +153,10 @@
 
           <button class="btn btn-primary" onclick="window.DP.App.switchView('map')">
             <span>🗺️ GIS Map</span>
+          </button>
+
+          <button id="compare-btn" class="btn" onclick="window.DP.App.toggleCompareMode()" title="Compare two scenarios side by side">
+            <span>⚡ Compare</span>
           </button>
 
           <button id="theme-toggle-btn" class="btn" onclick="window.DP.App.toggleTheme()" title="Toggle Light / Dark Theme" style="display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; padding: 0; min-width: 34px;">
@@ -394,6 +406,9 @@
               <button class="map-ctrl-btn active" onclick="window.DP.App.ui.map.toggleLayer('staging')">
                 <span class="map-ctrl-icon">⛺</span> K-Means Staging Hubs
               </button>
+              <button class="map-ctrl-btn" id="btn-toggle-heatmap" onclick="window.DP.App.ui.map.toggleHeatmap(window.DP.App.simulator.incidents)">
+                <span class="map-ctrl-icon">🔥</span> Incident Heatmap
+              </button>
             </div>
           </div>
         </div>
@@ -610,6 +625,60 @@
           </div>
         </div>
 
+        <!-- 7. TIMELINE VIEW -->
+        <div id="timeline-view" class="view-container" style="display: none;">
+          <div class="timeline-container">
+            <div class="timeline-header">
+              <div class="timeline-title">🕒 Event Timeline</div>
+              <div class="timeline-subtitle">Chronological log of all incidents and system events</div>
+              <div class="timeline-filters" id="timeline-filters">
+                <button class="filter-pill active" onclick="window.DP.App.ui.timeline.setFilter('all', this)">All Events</button>
+                <button class="filter-pill" onclick="window.DP.App.ui.timeline.setFilter('incident', this)">🚨 Incidents</button>
+                <button class="filter-pill" onclick="window.DP.App.ui.timeline.setFilter('escalation', this)">⬆ Escalations</button>
+                <button class="filter-pill" onclick="window.DP.App.ui.timeline.setFilter('resolved', this)">✅ Resolved</button>
+                <button class="filter-pill" onclick="window.DP.App.ui.timeline.setFilter('scenario', this)">🎯 Scenario</button>
+              </div>
+            </div>
+            <div class="timeline-feed" id="timeline-feed"></div>
+          </div>
+        </div>
+
+        <!-- COMPARISON MODE OVERLAY -->
+        <div id="compare-view" class="view-container" style="display:none;">
+          <div class="compare-wrapper">
+            <div class="compare-panel" id="compare-panel-a">
+              <div class="compare-panel-header">
+                <span class="compare-panel-label">SCENARIO A</span>
+                <select id="compare-select-a" class="scenario-select" style="font-size:11px; padding:4px 10px;" onchange="window.DP.App.compareManager.loadScenarioA(this.value)">
+                  <option value="HURRICANE">🌀 Hurricane (Chennai)</option>
+                  <option value="EARTHQUAKE">🌋 Earthquake (Uttarakhand)</option>
+                  <option value="WILDFIRE">🔥 Wildfire (Nilgiris)</option>
+                  <option value="FLOOD">🌊 Flood (Assam)</option>
+                  <option value="CHEMICAL">☣️ Chemical (Jamnagar)</option>
+                </select>
+                <button class="btn btn-danger" onclick="window.DP.App.toggleCompareMode()" style="padding:4px 10px; font-size:11px;">✕ Exit Compare</button>
+              </div>
+              <div class="compare-kpis" id="compare-kpis-a"></div>
+              <div class="compare-incidents" id="compare-incidents-a"></div>
+            </div>
+            <div class="compare-divider"></div>
+            <div class="compare-panel" id="compare-panel-b">
+              <div class="compare-panel-header">
+                <span class="compare-panel-label">SCENARIO B</span>
+                <select id="compare-select-b" class="scenario-select" style="font-size:11px; padding:4px 10px;" onchange="window.DP.App.compareManager.loadScenarioB(this.value)">
+                  <option value="EARTHQUAKE">🌋 Earthquake (Uttarakhand)</option>
+                  <option value="HURRICANE">🌀 Hurricane (Chennai)</option>
+                  <option value="WILDFIRE">🔥 Wildfire (Nilgiris)</option>
+                  <option value="FLOOD">🌊 Flood (Assam)</option>
+                  <option value="CHEMICAL">☣️ Chemical (Jamnagar)</option>
+                </select>
+              </div>
+              <div class="compare-kpis" id="compare-kpis-b"></div>
+              <div class="compare-incidents" id="compare-incidents-b"></div>
+            </div>
+          </div>
+        </div>
+
       </div> <!-- end #views-wrapper -->
     </main>
 
@@ -632,6 +701,7 @@
 
   <!-- CDN JS Libraries -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
   <script src="https://cesium.com/downloads/cesiumjs/releases/1.115/Build/Cesium/Cesium.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -658,6 +728,8 @@
   <script src="js/components/resources.js"></script>
   <script src="js/components/comms.js"></script>
   <script src="js/components/charts.js"></script>
+  <script src="js/components/timeline.js"></script>
+  <script src="js/components/compare.js"></script>
 
   <!-- Main App Controller -->
   <script src="js/app.js"></script>

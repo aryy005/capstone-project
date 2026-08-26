@@ -10,6 +10,30 @@ window.DP.AlertSystem = class {
     this.alertCount = 0;
   }
 
+  async requestPushPermission() {
+    if (!('Notification' in window)) return;
+    if (Notification.permission === 'default') {
+      const perm = await Notification.requestPermission();
+      if (perm === 'granted') {
+        this.show('Notifications Enabled', 'You will receive alerts for critical incidents.', 'INFO', '🔔', 4000);
+      }
+    }
+  }
+
+  _pushNotification(title, body, icon = '🚨') {
+    if (Notification.permission !== 'granted') return;
+    // Don't push if tab is visible
+    if (!document.hidden) return;
+    try {
+      new Notification(`AEGIS: ${title}`, {
+        body,
+        icon: '/favicon.ico',
+        badge: '/favicon.ico',
+        tag: 'aegis-alert'
+      });
+    } catch(e) {}
+  }
+
   show(title, message, severity = 'LOW', icon = '🔔', duration = 5000) {
     this.alertCount++;
     if (this.badgeEl) this.badgeEl.textContent = this.alertCount;
@@ -77,10 +101,16 @@ window.DP.AlertSystem = class {
     const icon = icons[inc.type] || '⚠️';
     const msg = `${inc.title} — ${(inc.populationAffected||0).toLocaleString()} people affected. Severity Level ${inc.severity}.`;
     this.show(`New ${window.DP.Helpers.capitalize(inc.type||'Incident')} Incident`, msg, sev, icon, 6000);
+    if (inc.severity >= 4) {
+      this._pushNotification(`L${inc.severity} ${window.DP.Helpers.capitalize(inc.type||'Incident')}`, msg);
+    }
   }
 
   escalation(inc) {
     this.show('⬆ Severity Escalation', `${inc.title} has escalated to Level ${inc.severity}`, 'HIGH', '🔺', 5000);
+    if (inc.severity >= 4) {
+      this._pushNotification('Severity Escalation', `${inc.title} escalated to Level ${inc.severity}`);
+    }
   }
 
   resourceLow(type, count) {

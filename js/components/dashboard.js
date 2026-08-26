@@ -322,20 +322,34 @@ window.DP.DashboardComponent = class {
 
   renderWeather(weather) {
     if (!this.elements.weatherGrid) return;
+    const isLive = weather.isLiveAPI === true;
     const items = [
-      { label: 'Wind Speed', val: `${Math.round((weather.windSpeed || 0.5) * 120)} km/h`, pct: (weather.windSpeed || 0.5) * 100, color: '#00d4ff' },
-      { label: 'Rainfall',   val: `${Math.round((weather.rainfall  || 0.3) * 150)} mm`,   pct: (weather.rainfall  || 0.3) * 100, color: '#00e676' },
-      { label: 'Seismic',    val: `${((weather.seismicActivity || 0.1) * 9).toFixed(1)} R`, pct: (weather.seismicActivity || 0.1) * 100, color: '#ff6d00' },
-      { label: 'Humidity',   val: `${Math.round((weather.humidity || 0.5) * 100)}%`,       pct: (weather.humidity  || 0.5) * 100, color: '#7c4dff' }
+      { label: 'Wind Speed', val: `${Math.round((weather.windSpeed || 0.5) * 120)} km/h`, pct: (weather.windSpeed || 0.5) * 100, color: '#00d4ff', icon: '💨' },
+      { label: 'Rainfall',   val: `${Math.round((weather.rainfall  || 0.3) * 150)} mm`,   pct: (weather.rainfall  || 0.3) * 100, color: '#00e676', icon: '🌧️' },
+      { label: 'Seismic',    val: `${((weather.seismicActivity || 0.1) * 9).toFixed(1)} R`, pct: (weather.seismicActivity || 0.1) * 100, color: '#ff6d00', icon: '📡' },
+      { label: 'Humidity',   val: `${Math.round((weather.humidity || 0.5) * 100)}%`,       pct: (weather.humidity  || 0.5) * 100, color: '#7c4dff', icon: '💧' },
+      { label: 'Temperature', val: `${Math.round((weather.temperature || 0.5) * 50)}°C`,  pct: (weather.temperature || 0.5) * 100, color: '#ffd600', icon: '🌡️' }
     ];
-    this.elements.weatherGrid.innerHTML = `<div class="weather-grid">${items.map(i => `
-      <div class="weather-item">
-        <div class="weather-item-label">${i.label}</div>
-        <div class="weather-item-value">${i.val}</div>
-        <div class="weather-item-bar progress-bar">
-          <div class="progress-fill" style="width:${i.pct}%; background:${i.color}"></div>
-        </div>
-      </div>`).join('')}</div>`;
+    this.elements.weatherGrid.innerHTML = `
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+        <span style="font-size:11px; font-weight:800; letter-spacing:1.2px; text-transform:uppercase; color:#94a3b8;">Live Weather Telemetry</span>
+        <span style="font-size:9px; font-weight:800; padding:2px 8px; border-radius:10px; letter-spacing:0.8px; ${
+          isLive
+            ? 'background:rgba(0,230,118,0.12); color:#00e676; border:1px solid rgba(0,230,118,0.3);'
+            : 'background:rgba(148,163,184,0.1); color:#64748b; border:1px solid rgba(148,163,184,0.2);'
+        }">${isLive ? '🟢 LIVE API' : '⚫ SIMULATED'}</span>
+      </div>
+      <div class="weather-grid">${items.map(i => `
+        <div class="weather-item">
+          <div style="display:flex; align-items:center; gap:6px;">
+            <span style="font-size:14px;">${i.icon}</span>
+            <div class="weather-item-label">${i.label}</div>
+          </div>
+          <div class="weather-item-value">${i.val}</div>
+          <div class="weather-item-bar progress-bar">
+            <div class="progress-fill" style="width:${i.pct.toFixed(1)}%; background:${i.color}"></div>
+          </div>
+        </div>`).join('')}</div>`;
   }
 
   renderAIInsights(simulator, ai) {

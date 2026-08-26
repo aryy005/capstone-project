@@ -19,9 +19,11 @@ class Application {
       map:       new window.DP.MapManager(),
       resources: new window.DP.ResourceManager(),
       comms:     new window.DP.CommsLog(),
-      charts:    new window.DP.ChartManager()
+      charts:    new window.DP.ChartManager(),
+      timeline:  new window.DP.TimelineManager()
     };
 
+    this.compareManager = new window.DP.CompareManager();
     this.currentView      = 'dashboard';
     this.selectedScenario = window.DP.Scenarios.HURRICANE;
   }
@@ -51,6 +53,9 @@ class Application {
 
     // Clock
     this.startClock();
+    
+    // Request push notifications
+    this.alerts.requestPushPermission();
   }
 
   initTheme() {
@@ -107,10 +112,13 @@ class Application {
 
     this.simulator.on('newIncident', (inc) => {
       this.alerts.incident(inc);
+      const icons = { hurricane:'🌀', earthquake:'🌋', wildfire:'🔥', flood:'🌊', chemical:'☣️' };
+      this.ui.timeline.addEvent('incident', `New ${window.DP.Helpers.capitalize(inc.type||'Incident')}`, `${inc.title} — L${inc.severity} severity, ${(inc.populationAffected||0).toLocaleString()} people affected.`, inc.severity, icons[inc.type] || '⚠️');
     });
 
     this.simulator.on('severityEscalation', (inc) => {
       this.alerts.escalation(inc);
+      this.ui.timeline.addEvent('escalation', `Severity Escalated: ${inc.title}`, `Incident upgraded to Level ${inc.severity}. Immediate response may be required.`, inc.severity, '🔺');
     });
   }
 
@@ -120,6 +128,7 @@ class Application {
 
     this.selectedScenario = scenario;
     this.simulator.loadScenario(scenario);
+    this.ui.timeline?.addEvent('scenario', `Scenario Loaded: ${scenario.name}`, `Switched to ${scenario.name}. ${scenario.incidents?.length || 0} initial incidents loaded.`, 1, '🎯');
 
     if (this.ui.map.map) {
       this.ui.map.setCenter(scenario.center, 10);
@@ -248,6 +257,28 @@ class Application {
     }
   }
 
+  toggleCompareMode() {
+    const compareView = document.getElementById('compare-view');
+    const isComparing = compareView && compareView.style.display !== 'none';
+
+    // Hide all views
+    document.querySelectorAll('.view-container').forEach(el => el.style.display = 'none');
+
+    if (!isComparing) {
+      if (compareView) compareView.style.display = 'block';
+      if (!this.compareManager._initialized) {
+        this.compareManager.init();
+        this.compareManager._initialized = true;
+      }
+      document.getElementById('compare-btn')?.classList.add('btn-primary');
+      // Remove active state from all nav items
+      document.querySelectorAll('.nav-item[data-view]').forEach(el => el.classList.remove('active'));
+    } else {
+      this.switchView(this.currentView);
+      document.getElementById('compare-btn')?.classList.remove('btn-primary');
+    }
+  }
+
   switchView(viewId) {
     this.currentView = viewId;
 
@@ -368,6 +399,12 @@ class Application {
         }
       });
     });
+  }
+
+  toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+    if (sidebar) sidebar.classList.toggle('open');
   }
 
   startClock() {
