@@ -1,4 +1,4 @@
-/* ===== SENTINEL AI LANDING PAGE STYLES ===== */
+/* ===== AEGIS AI LANDING PAGE STYLES ===== */
 
 /* Standalone Full-Screen Mode for Landing Page */
 #app.is-landing #sidebar {
@@ -620,7 +620,7 @@
   line-height: 1.2;
 }
 
-/* ===== HOW SENTINEL AI WORKS (WORKFLOW GRID) ===== */
+/* ===== HOW AEGIS AI WORKS (WORKFLOW GRID) ===== */
 .workflow-section {
   display: flex;
   flex-direction: column;
