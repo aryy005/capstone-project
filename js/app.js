@@ -24,7 +24,7 @@ class Application {
     };
 
     this.compareManager = new window.DP.CompareManager();
-    this.currentView      = 'dashboard';
+    this.currentView      = 'landing';
     this.selectedScenario = window.DP.Scenarios.HURRICANE;
   }
 
@@ -216,10 +216,20 @@ class Application {
     const fillEl    = document.getElementById('sidebar-threat-fill');
     if (fillEl) fillEl.style.width = `${threatPct}%`;
 
-    // Update alert badge
+    // Update alert badge & landing stats
     const badgeEl = document.getElementById('alert-badge');
+    const activeIncidents = this.simulator.incidents.filter(i => i.status === 'ACTIVE').length;
     const criticalCount = this.simulator.incidents.filter(i => i.severity >= 5).length;
     if (badgeEl) badgeEl.textContent = criticalCount > 0 ? criticalCount : '';
+
+    const landAct = document.getElementById('landing-live-active');
+    const landCrit = document.getElementById('landing-live-crit');
+    const landUnits = document.getElementById('landing-live-units');
+    const landPop = document.getElementById('landing-live-pop');
+    if (landAct) landAct.textContent = activeIncidents;
+    if (landCrit) landCrit.textContent = `${criticalCount} Critical`;
+    if (landUnits) landUnits.textContent = stats.deployed || 27;
+    if (landPop) landPop.textContent = (stats.totalPop || 12400).toLocaleString();
   }
 
   updateAIEngineView() {
@@ -292,10 +302,10 @@ class Application {
       el.style.display = 'none';
     });
 
-    // Show selected view — dashboard and map use flex, others use block
+    // Show selected view — landing, dashboard and map use flex, others use block
     const target = document.getElementById(`${viewId}-view`);
     if (target) {
-      const flexViews = ['dashboard', 'map'];
+      const flexViews = ['landing', 'dashboard', 'map'];
       target.style.display = flexViews.includes(viewId) ? 'flex' : 'block';
     }
 

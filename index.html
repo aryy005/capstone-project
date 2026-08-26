@@ -23,6 +23,7 @@
 
   <!-- App CSS -->
   <link rel="stylesheet" href="css/index.css">
+  <link rel="stylesheet" href="css/landing.css">
   <link rel="stylesheet" href="css/splash.css">
   <link rel="stylesheet" href="css/dashboard.css">
   <link rel="stylesheet" href="css/map.css">
@@ -54,7 +55,11 @@
       <nav class="sidebar-nav">
         <div class="nav-section">
           <div class="nav-section-title">Navigation</div>
-          <div class="nav-item active" data-view="dashboard" id="nav-dashboard">
+          <div class="nav-item active" data-view="landing" id="nav-landing">
+            <span class="nav-icon">🌐</span>
+            <span>Home Portal</span>
+          </div>
+          <div class="nav-item" data-view="dashboard" id="nav-dashboard">
             <span class="nav-icon">📊</span>
             <span>Dashboard</span>
           </div>
@@ -168,8 +173,297 @@
       <!-- ===== VIEW CONTAINERS ===== -->
       <div id="views-wrapper">
 
+        <!-- 0. SENTINEL AI LANDING VIEW -->
+        <div id="landing-view" class="view-container" style="display: flex;">
+          <div class="landing-container">
+            
+            <!-- LANDING HEADER / NAVBAR -->
+            <header class="landing-header">
+              <div class="landing-logo" onclick="window.DP.App.switchView('landing')">
+                <div class="landing-logo-icon">🛡️</div>
+                <div class="landing-logo-text">
+                  <div class="landing-logo-title">SENTINEL AI</div>
+                  <div class="landing-logo-sub">EMERGENCY INTELLIGENCE SYSTEM</div>
+                </div>
+              </div>
+
+              <nav class="landing-nav-menu">
+                <span class="landing-nav-link active" onclick="window.DP.App.switchView('landing')">Home</span>
+                <span class="landing-nav-link" onclick="window.DP.App.switchView('map')">Live Map</span>
+                <span class="landing-nav-link" onclick="window.DP.App.switchView('dashboard')">Incidents</span>
+                <span class="landing-nav-link" onclick="window.DP.App.switchView('ai')">AI Intelligence</span>
+                <span class="landing-nav-link" onclick="window.DP.App.switchView('resources')">Resources</span>
+                <span class="landing-nav-link" onclick="window.DP.App.switchView('analytics')">About Us</span>
+              </nav>
+
+              <div class="landing-header-actions">
+                <button class="landing-icon-btn" onclick="window.DP.App.toggleTheme()" title="Toggle Theme">
+                  <span>🌙</span>
+                </button>
+                <button class="landing-icon-btn" onclick="window.DP.App.switchView('comms')" title="Alerts">
+                  <span>🔔</span>
+                  <span class="landing-icon-badge"></span>
+                </button>
+                <button class="btn-cmd-header" onclick="window.DP.App.switchView('dashboard')">
+                  <span>Command Center →</span>
+                </button>
+              </div>
+            </header>
+
+            <!-- HERO SECTION -->
+            <section class="landing-hero">
+              <div class="hero-left">
+                <div class="hero-badge">
+                  <span>AI-POWERED • REAL-TIME • LIFE-SAVING</span>
+                </div>
+                <h1 class="hero-title">
+                  AI THAT SEES THE RISK BEFORE IT BECOMES <br>
+                  <span class="highlight">A CRISIS.</span>
+                </h1>
+                <p class="hero-subtitle">
+                  SENTINEL AI detects, predicts, and helps respond to emergencies faster with intelligent insights and real-time coordination.
+                </p>
+                <div class="hero-actions">
+                  <button class="btn-hero-primary" onclick="window.DP.App.switchView('dashboard')">
+                    <span>Launch Command Center →</span>
+                  </button>
+                  <button class="btn-hero-secondary" onclick="window.DP.App.switchView('map')">
+                    <span>View Live Situation 👁</span>
+                  </button>
+                </div>
+              </div>
+
+              <div class="hero-right">
+                <div class="globe-map-container">
+                  <!-- Dotted Map World Graphic background -->
+                  <svg class="globe-svg-bg" viewBox="0 0 800 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="400" cy="250" r="220" stroke="rgba(56, 189, 248, 0.15)" stroke-dasharray="4 4"/>
+                    <circle cx="400" cy="250" r="160" stroke="rgba(56, 189, 248, 0.1)" stroke-dasharray="6 6"/>
+                    <circle cx="400" cy="250" r="100" stroke="rgba(0, 240, 255, 0.2)"/>
+                    <path d="M 180 250 Q 400 120 620 250" stroke="rgba(0, 240, 255, 0.25)" stroke-width="1.5" fill="none" stroke-dasharray="3 3"/>
+                    <path d="M 220 300 Q 400 180 580 300" stroke="rgba(168, 85, 247, 0.25)" stroke-width="1.5" fill="none" stroke-dasharray="3 3"/>
+                  </svg>
+
+                  <!-- Map Ping Nodes matching image -->
+                  <div class="map-ping-node flood" onclick="window.DP.App.switchView('dashboard')">
+                    <span class="ping-pulse"></span>
+                    <span>FLOOD RISK <strong>HIGH</strong></span>
+                  </div>
+                  <div class="map-ping-node wildfire" onclick="window.DP.App.switchView('dashboard')">
+                    <span class="ping-pulse"></span>
+                    <span>WILDFIRE <strong>MODERATE</strong></span>
+                  </div>
+                  <div class="map-ping-node earthquake" onclick="window.DP.App.switchView('dashboard')">
+                    <span class="ping-pulse"></span>
+                    <span>EARTHQUAKE <strong>MODERATE</strong></span>
+                  </div>
+                  <div class="map-ping-node storm" onclick="window.DP.App.switchView('dashboard')">
+                    <span class="ping-pulse"></span>
+                    <span>STORM ALERT <strong>LOW</strong></span>
+                  </div>
+                </div>
+
+                <!-- Floating Live Overview Card matching image -->
+                <div class="floating-live-card">
+                  <div class="live-card-header">LIVE OVERVIEW</div>
+                  <div class="live-card-list">
+                    <div class="live-card-item">
+                      <div class="live-item-left">
+                        <div class="live-item-icon">🚨</div>
+                        <div class="live-item-info">
+                          <div class="live-item-val" id="landing-live-active">12</div>
+                          <div class="live-item-lbl">Active Incidents</div>
+                        </div>
+                      </div>
+                      <span class="live-badge-crit" id="landing-live-crit">4 Critical</span>
+                    </div>
+
+                    <div class="live-card-item">
+                      <div class="live-item-left">
+                        <div class="live-item-icon">🚑</div>
+                        <div class="live-item-info">
+                          <div class="live-item-val" id="landing-live-units">27</div>
+                          <div class="live-item-lbl">Response Units</div>
+                        </div>
+                      </div>
+                      <span class="live-card-link" onclick="window.DP.App.switchView('resources')">View Units</span>
+                    </div>
+
+                    <div class="live-card-item">
+                      <div class="live-item-left">
+                        <div class="live-item-icon">🛡️</div>
+                        <div class="live-item-info">
+                          <div class="live-item-val">93%</div>
+                          <div class="live-item-lbl">Resource Availability</div>
+                        </div>
+                      </div>
+                      <span class="live-badge-opt">Optimal</span>
+                    </div>
+
+                    <div class="live-card-item">
+                      <div class="live-item-left">
+                        <div class="live-item-icon">👥</div>
+                        <div class="live-item-info">
+                          <div class="live-item-val" id="landing-live-pop">12,400</div>
+                          <div class="live-item-lbl">People Protected</div>
+                        </div>
+                      </div>
+                      <span style="font-size: 9px; color: #64748b;">Today</span>
+                    </div>
+                  </div>
+
+                  <div class="live-card-link" onclick="window.DP.App.switchView('dashboard')" style="margin-top: 6px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.06); justify-content: space-between;">
+                    <span>Go to Dashboard</span>
+                    <span>→</span>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- INTELLIGENCE BANNER STRIP -->
+            <div class="intelligence-banner">
+              <div class="intel-left">
+                <div class="intel-hex-icon">AI</div>
+                <div class="intel-text">
+                  <div class="intel-title">INTELLIGENCE THAT MAKES A DIFFERENCE</div>
+                  <div class="intel-desc">
+                    SENTINEL AI uses advanced AI models, IoT data, satellite imagery, and citizen reports to deliver real-time intelligence and save lives.
+                  </div>
+                </div>
+              </div>
+              <div class="intel-pillars">
+                <div class="pillar-item">
+                  <span class="pillar-icon">📊</span>
+                  <span class="pillar-label">AI Risk Prediction</span>
+                </div>
+                <div class="pillar-item">
+                  <span class="pillar-icon">🔔</span>
+                  <span class="pillar-label">Real-time Alerts</span>
+                </div>
+                <div class="pillar-item">
+                  <span class="pillar-icon">🤝</span>
+                  <span class="pillar-label">Smart Coordination</span>
+                </div>
+                <div class="pillar-item">
+                  <span class="pillar-icon">🧠</span>
+                  <span class="pillar-label">Continuous Learning</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- WORKFLOW GRID: HOW SENTINEL AI WORKS -->
+            <section class="workflow-section">
+              <div class="workflow-header">
+                <div class="workflow-title">HOW SENTINEL AI WORKS</div>
+                <div class="workflow-sub">Detect. Predict. Decide. Respond.</div>
+              </div>
+              <div class="workflow-grid">
+                <div class="workflow-card step-1">
+                  <div class="workflow-card-top">
+                    <div class="workflow-circle-icon">📡</div>
+                    <span class="step-num">01</span>
+                  </div>
+                  <div class="workflow-card-title">DETECT</div>
+                  <div class="workflow-card-desc">
+                    AI scans multiple data sources including sensors, satellite imagery, CCTV, and reports.
+                  </div>
+                  <div class="workflow-card-link" onclick="window.DP.App.switchView('map')">
+                    <span>Learn more</span> <span>→</span>
+                  </div>
+                </div>
+
+                <div class="workflow-card step-2">
+                  <div class="workflow-card-top">
+                    <div class="workflow-circle-icon">🔮</div>
+                    <span class="step-num">02</span>
+                  </div>
+                  <div class="workflow-card-title">PREDICT</div>
+                  <div class="workflow-card-desc">
+                    Machine learning models predict the severity, impact area, and potential risks.
+                  </div>
+                  <div class="workflow-card-link" onclick="window.DP.App.switchView('ai')">
+                    <span>Learn more</span> <span>→</span>
+                  </div>
+                </div>
+
+                <div class="workflow-card step-3">
+                  <div class="workflow-card-top">
+                    <div class="workflow-circle-icon">🛡️</div>
+                    <span class="step-num">03</span>
+                  </div>
+                  <div class="workflow-card-title">DECIDE</div>
+                  <div class="workflow-card-desc">
+                    AI recommends the best course of action, evacuation routes and resource allocation.
+                  </div>
+                  <div class="workflow-card-link" onclick="window.DP.App.switchView('analytics')">
+                    <span>Learn more</span> <span>→</span>
+                  </div>
+                </div>
+
+                <div class="workflow-card step-4">
+                  <div class="workflow-card-top">
+                    <div class="workflow-circle-icon">🎯</div>
+                    <span class="step-num">04</span>
+                  </div>
+                  <div class="workflow-card-title">RESPOND</div>
+                  <div class="workflow-card-desc">
+                    Coordinate response teams and communicate in real-time to ensure faster relief.
+                  </div>
+                  <div class="workflow-card-link" onclick="window.DP.App.switchView('resources')">
+                    <span>Learn more</span> <span>→</span>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- BOTTOM METRICS IMPACT BAR -->
+            <div class="impact-stats-bar">
+              <div class="impact-stat-item">
+                <div class="stat-icon-wrap">⚡</div>
+                <div class="stat-info">
+                  <div class="stat-val">2.4M+</div>
+                  <div class="stat-lbl">Data Points Analyzed Every Day</div>
+                </div>
+              </div>
+
+              <div class="impact-stat-item">
+                <div class="stat-icon-wrap">🌐</div>
+                <div class="stat-info">
+                  <div class="stat-val">150+</div>
+                  <div class="stat-lbl">Organizations Connected Worldwide</div>
+                </div>
+              </div>
+
+              <div class="impact-stat-item">
+                <div class="stat-icon-wrap">🛡️</div>
+                <div class="stat-info">
+                  <div class="stat-val">98.7%</div>
+                  <div class="stat-lbl">Prediction Accuracy (AI Models)</div>
+                </div>
+              </div>
+
+              <div class="impact-stat-item">
+                <div class="stat-icon-wrap">⏱️</div>
+                <div class="stat-info">
+                  <div class="stat-val">3.2 min</div>
+                  <div class="stat-lbl">Average Response Time Reduced</div>
+                </div>
+              </div>
+
+              <div class="impact-stat-item">
+                <div class="stat-icon-wrap">❤️</div>
+                <div class="stat-info">
+                  <div class="stat-val">85K+</div>
+                  <div class="stat-lbl">Lives Impacted So Far</div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
         <!-- 1. DASHBOARD VIEW -->
-        <div id="dashboard-view" class="view-container" style="display: flex;">
+        <div id="dashboard-view" class="view-container" style="display: none;">
 
           <!-- TOP 5 KPI CARDS -->
           <div class="dash-kpi-row">
