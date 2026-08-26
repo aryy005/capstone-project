@@ -54,7 +54,7 @@ class Application {
   }
 
   initTheme() {
-    const savedTheme = localStorage.getItem('aegis-theme') || 'light';
+    const savedTheme = localStorage.getItem('aegis-theme') || 'dark';
     this.setTheme(savedTheme);
   }
 

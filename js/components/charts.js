@@ -8,12 +8,22 @@ window.DP.ChartManager = class {
   }
 
   init() {
+    // ── Analytics view charts (full-size) ──
     this.initIncidentTrendChart();
     this.initResourceDoughnutChart();
     this.initSeverityBarChart();
     this.initThreatRadarChart();
     this.initMonteCarloChart();
+
+    // ── Dashboard mini-charts ──
+    this.initDashIncidentTrendChart();
+    this.initDashDisasterTypesChart();
+    this.initDashResourceChart();
   }
+
+  // ─────────────────────────────────────────────────────────
+  //  ANALYTICS VIEW CHARTS
+  // ─────────────────────────────────────────────────────────
 
   initIncidentTrendChart() {
     const ctx = document.getElementById('chart-incident-trend');
@@ -167,7 +177,6 @@ window.DP.ChartManager = class {
     const ctx = document.getElementById('chart-monte-carlo');
     if (!ctx) return;
 
-    // Generate initial convergence curve (simulated)
     const labels = Array.from({ length: 20 }, (_, i) => `${(i + 1) * 25}`);
     const buildConvergence = (start, end) =>
       labels.map((_, i) => {
@@ -243,6 +252,114 @@ window.DP.ChartManager = class {
     });
   }
 
+  // ─────────────────────────────────────────────────────────
+  //  DASHBOARD MINI-CHARTS  (use chart-dash-* IDs)
+  // ─────────────────────────────────────────────────────────
+
+  initDashIncidentTrendChart() {
+    const ctx = document.getElementById('chart-dash-incident-trend');
+    if (!ctx) return;
+
+    this.charts.dashIncidentTrend = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ['-6h', '-5h', '-4h', '-3h', '-2h', '-1h', 'Now'],
+        datasets: [{
+          label: 'Active Incidents',
+          data: [4, 6, 8, 12, 10, 14, 11],
+          borderColor: '#00d4ff',
+          backgroundColor: 'rgba(0,212,255,0.12)',
+          fill: true,
+          tension: 0.4,
+          pointBackgroundColor: '#00d4ff',
+          pointRadius: 3
+        }, {
+          label: 'Critical',
+          data: [1, 2, 3, 5, 4, 6, 4],
+          borderColor: '#ff1744',
+          backgroundColor: 'rgba(255,23,68,0.08)',
+          fill: true,
+          tension: 0.4,
+          pointBackgroundColor: '#ff1744',
+          pointRadius: 3
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: true, labels: { color: '#8892aa', boxWidth: 8, font: { size: 9 } } }
+        },
+        scales: {
+          x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#8892aa', font: { size: 9 } } },
+          y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#8892aa', font: { size: 9 } } }
+        }
+      }
+    });
+  }
+
+  initDashDisasterTypesChart() {
+    const ctx = document.getElementById('chart-dash-disaster-types');
+    if (!ctx) return;
+
+    this.charts.dashDisasterTypes = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Hurricane', 'Flood', 'Wildfire', 'Earthquake', 'Chemical'],
+        datasets: [{
+          data: [35, 25, 20, 12, 8],
+          backgroundColor: ['#7c4dff', '#00b0ff', '#ff1744', '#ff6d00', '#76ff03'],
+          borderWidth: 0,
+          hoverOffset: 6
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '65%',
+        plugins: {
+          legend: {
+            position: 'right',
+            labels: { color: '#8892aa', boxWidth: 8, font: { size: 9 } }
+          }
+        }
+      }
+    });
+  }
+
+  initDashResourceChart() {
+    const ctx = document.getElementById('chart-dash-resource-allocation');
+    if (!ctx) return;
+
+    this.charts.dashResourceAllocation = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Ambulance', 'Fire Engine', 'Rescue Team', 'Helicopter', 'Medical Unit', 'Supply Truck'],
+        datasets: [{
+          data: [30, 22, 20, 8, 12, 8],
+          backgroundColor: ['#00e676', '#ff6d00', '#7c4dff', '#00d4ff', '#ffd600', '#ff1744'],
+          borderWidth: 0,
+          hoverOffset: 6
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '65%',
+        plugins: {
+          legend: {
+            position: 'right',
+            labels: { color: '#8892aa', boxWidth: 8, font: { size: 9 } }
+          }
+        }
+      }
+    });
+  }
+
+  // ─────────────────────────────────────────────────────────
+  //  SHARED UTILITIES
+  // ─────────────────────────────────────────────────────────
+
   resizeAll() {
     Object.values(this.charts).forEach(chart => {
       if (chart && typeof chart.resize === 'function') {
@@ -278,7 +395,7 @@ window.DP.ChartManager = class {
     const { simulator, ai } = data;
     if (!this.charts.incidentTrend) this.init();
 
-    // Update Analytics KPI summary elements if present
+    // ── Analytics KPI summary elements ──
     const bayValEl = document.getElementById('analytics-kpi-bayesian');
     const bayTypeEl = document.getElementById('analytics-kpi-bayesian-type');
     if (bayValEl && ai?.bayesian) {
@@ -302,7 +419,7 @@ window.DP.ChartManager = class {
       corrEl.textContent = `${(ai.astar.routes || []).length} active`;
     }
 
-    // Update Threat Radar with Bayesian posteriors
+    // ── Threat Radar with Bayesian posteriors ──
     if (this.charts.threatRadar && ai?.bayesian) {
       const threats = ai.bayesian.posteriors;
       const sortedTypes = ['hurricane', 'earthquake', 'wildfire', 'flood', 'chemical', 'tsunami', 'tornado'];
@@ -311,7 +428,7 @@ window.DP.ChartManager = class {
       this.charts.threatRadar.update();
     }
 
-    // Update Severity Bar with Decision Tree distribution
+    // ── Severity Distribution from Decision Tree ──
     if (this.charts.severityDistribution && ai?.decisionTree) {
       const dist = ai.decisionTree.getSeverityDistribution();
       this.charts.severityDistribution.data.datasets[0].data =
@@ -319,7 +436,7 @@ window.DP.ChartManager = class {
       this.charts.severityDistribution.update();
     }
 
-    // Update Incident Trend (rolling window)
+    // ── Incident Trend (analytics — rolling window) ──
     if (this.charts.incidentTrend && simulator) {
       const stats = simulator.getStats();
       this.incidentHistory.push(stats.active);
@@ -329,13 +446,17 @@ window.DP.ChartManager = class {
       this.charts.incidentTrend.update();
     }
 
-    // Update Monte Carlo chart with fresh convergence data when simulation runs
+    // ── Dashboard mini: incident trend ──
+    if (this.charts.dashIncidentTrend && simulator) {
+      this.charts.dashIncidentTrend.data.datasets[0].data = [...this.incidentHistory];
+      this.charts.dashIncidentTrend.update();
+    }
+
+    // ── Monte Carlo convergence chart ──
     if (this.charts.monteCarlo && ai?.monteCarlo?.results) {
       const res = ai.monteCarlo.results;
       const maxProb = res.maxProbability || 0.5;
-      const zones = res.confidenceZones || [];
 
-      // Recompute convergence curves based on actual maxProb
       const labels = Array.from({ length: 20 }, (_, i) => `${(i + 1) * 25}`);
       const curve = (factor) => labels.map((_, i) => {
         const t = i / 19;
@@ -351,7 +472,7 @@ window.DP.ChartManager = class {
       this.charts.monteCarlo.update();
     }
 
-    // Update Resource Doughnut from simulator
+    // ── Resource doughnut (analytics) from simulator ──
     if (this.charts.resourceAllocation && simulator?.resources?.length > 0) {
       const types = ['AMBULANCE', 'FIRE_ENGINE', 'RESCUE_TEAM', 'HELICOPTER', 'MEDICAL_UNIT', 'SUPPLY_TRUCK'];
       const counts = types.map(t =>
@@ -360,6 +481,30 @@ window.DP.ChartManager = class {
       if (counts.some(c => c > 0)) {
         this.charts.resourceAllocation.data.datasets[0].data = counts;
         this.charts.resourceAllocation.update();
+      }
+    }
+
+    // ── Dashboard mini: resource doughnut ──
+    if (this.charts.dashResourceAllocation && simulator?.resources?.length > 0) {
+      const types = ['AMBULANCE', 'FIRE_ENGINE', 'RESCUE_TEAM', 'HELICOPTER', 'MEDICAL_UNIT', 'SUPPLY_TRUCK'];
+      const counts = types.map(t =>
+        simulator.resources.filter(r => r.type?.toUpperCase() === t).length
+      );
+      if (counts.some(c => c > 0)) {
+        this.charts.dashResourceAllocation.data.datasets[0].data = counts;
+        this.charts.dashResourceAllocation.update();
+      }
+    }
+
+    // ── Dashboard mini: disaster types by active incidents ──
+    if (this.charts.dashDisasterTypes && simulator?.incidents?.length > 0) {
+      const typeKeys = ['HURRICANE', 'FLOOD', 'WILDFIRE', 'EARTHQUAKE', 'CHEMICAL'];
+      const counts = typeKeys.map(t =>
+        simulator.incidents.filter(i => i.type?.toUpperCase() === t).length
+      );
+      if (counts.some(c => c > 0)) {
+        this.charts.dashDisasterTypes.data.datasets[0].data = counts;
+        this.charts.dashDisasterTypes.update();
       }
     }
   }

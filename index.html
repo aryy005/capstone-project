@@ -150,7 +150,13 @@
           <button id="theme-toggle-btn" class="btn" onclick="window.DP.App.toggleTheme()" title="Toggle Light / Dark Theme" style="display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; padding: 0; min-width: 34px;">
             <span id="theme-toggle-icon" style="font-size: 16px;">🌙</span>
           </button>
-        <!-- 1. DASHBOARD VIEW (MATCHING IMAGE 1) -->
+        </div>
+      </header>
+
+      <!-- ===== VIEW CONTAINERS ===== -->
+      <div id="views-wrapper">
+
+        <!-- 1. DASHBOARD VIEW -->
         <div id="dashboard-view" class="view-container" style="display: flex;">
 
           <!-- TOP 5 KPI CARDS -->
@@ -337,7 +343,7 @@
                 </select>
               </div>
               <div class="chart-wrapper">
-                <canvas id="chart-incident-trend"></canvas>
+                <canvas id="chart-dash-incident-trend"></canvas>
               </div>
             </div>
 
@@ -346,7 +352,7 @@
                 <div class="chart-box-title">Incident By Type</div>
               </div>
               <div class="chart-wrapper">
-                <canvas id="chart-disaster-types"></canvas>
+                <canvas id="chart-dash-disaster-types"></canvas>
               </div>
             </div>
 
@@ -355,18 +361,13 @@
                 <div class="chart-box-title">Resource Status</div>
               </div>
               <div class="chart-wrapper">
-                <canvas id="chart-resource-allocation"></canvas>
+                <canvas id="chart-dash-resource-allocation"></canvas>
               </div>
             </div>
 
           </div>
-        </div>iv>
-              <div class="panel-body" id="weather-grid-container"></div>
-            </div>
 
-          </div>
-
-        </div>
+        </div> <!-- end #dashboard-view -->
 
         <!-- 2. GIS MAP VIEW -->
         <div id="map-view" class="view-container" style="display: none; overflow: hidden; position: relative;">
@@ -461,6 +462,13 @@
               <div class="chart-card-title">📈 Monte Carlo Convergence — Spread Probability</div>
               <div class="chart-wrapper">
                 <canvas id="chart-monte-carlo"></canvas>
+              </div>
+            </div>
+
+            <div class="chart-card">
+              <div class="chart-card-title">🌲 Incident Severity Distribution</div>
+              <div class="chart-wrapper">
+                <canvas id="chart-severity-distribution"></canvas>
               </div>
             </div>
           </div>
@@ -602,7 +610,7 @@
           </div>
         </div>
 
-      </div>
+      </div> <!-- end #views-wrapper -->
     </main>
 
     <!-- ALERT TOAST CONTAINER -->
