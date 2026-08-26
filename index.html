@@ -235,29 +235,30 @@
 
               <div class="hero-right">
                 <div class="globe-map-container">
-                  <!-- Dotted Map World Graphic background -->
-                  <svg class="globe-svg-bg" viewBox="0 0 800 500" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="400" cy="250" r="220" stroke="rgba(56, 189, 248, 0.15)" stroke-dasharray="4 4"/>
-                    <circle cx="400" cy="250" r="160" stroke="rgba(56, 189, 248, 0.1)" stroke-dasharray="6 6"/>
-                    <circle cx="400" cy="250" r="100" stroke="rgba(0, 240, 255, 0.2)"/>
-                    <path d="M 180 250 Q 400 120 620 250" stroke="rgba(0, 240, 255, 0.25)" stroke-width="1.5" fill="none" stroke-dasharray="3 3"/>
-                    <path d="M 220 300 Q 400 180 580 300" stroke="rgba(168, 85, 247, 0.25)" stroke-width="1.5" fill="none" stroke-dasharray="3 3"/>
+                  <!-- Live Dark Map of India / South Asia -->
+                  <div id="landing-hero-map" style="width:100%; height:100%; position:absolute; inset:0; z-index:1;"></div>
+
+                  <!-- Dotted Radar Lines Overlay -->
+                  <svg class="globe-svg-bg" viewBox="0 0 800 500" fill="none" xmlns="http://www.w3.org/2000/svg" style="z-index: 2; pointer-events: none;">
+                    <circle cx="480" cy="220" r="180" stroke="rgba(0, 240, 255, 0.15)" stroke-width="1" stroke-dasharray="4 4"/>
+                    <circle cx="480" cy="220" r="120" stroke="rgba(0, 240, 255, 0.1)" stroke-width="1" stroke-dasharray="6 6"/>
+                    <circle cx="480" cy="220" r="60" stroke="rgba(0, 240, 255, 0.2)" stroke-width="1"/>
                   </svg>
 
-                  <!-- Map Ping Nodes matching image -->
-                  <div class="map-ping-node flood" onclick="window.DP.App.switchView('dashboard')">
+                  <!-- Map Ping Nodes (Fallback & Interactive Overlay) -->
+                  <div class="map-ping-node flood" onclick="window.DP.App.switchView('dashboard')" style="z-index: 5;">
                     <span class="ping-pulse"></span>
                     <span>FLOOD RISK <strong>HIGH</strong></span>
                   </div>
-                  <div class="map-ping-node wildfire" onclick="window.DP.App.switchView('dashboard')">
+                  <div class="map-ping-node wildfire" onclick="window.DP.App.switchView('dashboard')" style="z-index: 5;">
                     <span class="ping-pulse"></span>
                     <span>WILDFIRE <strong>MODERATE</strong></span>
                   </div>
-                  <div class="map-ping-node earthquake" onclick="window.DP.App.switchView('dashboard')">
+                  <div class="map-ping-node earthquake" onclick="window.DP.App.switchView('dashboard')" style="z-index: 5;">
                     <span class="ping-pulse"></span>
                     <span>EARTHQUAKE <strong>MODERATE</strong></span>
                   </div>
-                  <div class="map-ping-node storm" onclick="window.DP.App.switchView('dashboard')">
+                  <div class="map-ping-node storm" onclick="window.DP.App.switchView('dashboard')" style="z-index: 5;">
                     <span class="ping-pulse"></span>
                     <span>STORM ALERT <strong>LOW</strong></span>
                   </div>

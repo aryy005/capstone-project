@@ -318,6 +318,13 @@ class Application {
       target.style.display = flexViews.includes(viewId) ? 'flex' : 'block';
     }
 
+    // Lazy init landing hero Leaflet dark map
+    if (viewId === 'landing') {
+      requestAnimationFrame(() => {
+        this.initLandingHeroMap();
+      });
+    }
+
     // Lazy init dashboard embedded map
     if (viewId === 'dashboard') {
       requestAnimationFrame(() => {
@@ -400,6 +407,54 @@ class Application {
         marker.bindTooltip(`🚨 ${inc.title} (L${inc.severity})`);
         marker.addTo(this.dashMarkersLayer);
       });
+    }
+  }
+
+  initLandingHeroMap() {
+    const container = document.getElementById('landing-hero-map');
+    if (!container || this.landingHeroMap || typeof L === 'undefined') return;
+
+    try {
+      this.landingHeroMap = L.map('landing-hero-map', {
+        center: [20.5937, 78.9629],
+        zoom: 4,
+        zoomControl: false,
+        attributionControl: false,
+        dragging: false,
+        scrollWheelZoom: false,
+        doubleClickZoom: false,
+        boxZoom: false,
+        touchZoom: false
+      });
+
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        maxZoom: 18
+      }).addTo(this.landingHeroMap);
+
+      // Concentric Radar Rings around key disaster centers
+      const hazards = [
+        { lat: 28.5, lng: 79.5, color: '#ff1744' }, // Flood High (North)
+        { lat: 14.5, lng: 77.5, color: '#ff6d00' }, // Wildfire Mod (Ghats)
+        { lat: 24.2, lng: 72.8, color: '#ffd600' }, // Earthquake Mod (West)
+        { lat: 12.5, lng: 86.5, color: '#38bdf8' }  // Storm Low (Bay of Bengal)
+      ];
+
+      hazards.forEach(h => {
+        L.circle([h.lat, h.lng], {
+          radius: 160000,
+          color: h.color,
+          fillColor: h.color,
+          fillOpacity: 0.15,
+          weight: 1.5,
+          dashArray: '4, 4'
+        }).addTo(this.landingHeroMap);
+      });
+
+      setTimeout(() => {
+        if (this.landingHeroMap) this.landingHeroMap.invalidateSize();
+      }, 200);
+    } catch (e) {
+      console.warn('Hero map init fallback:', e);
     }
   }
 

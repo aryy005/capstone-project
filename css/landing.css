@@ -334,6 +334,65 @@
   width: 100%;
   height: 100%;
   opacity: 0.35;
+  pointer-events: none;
+}
+
+/* Hero Tactical Leaflet Map Target Markers */
+.custom-hero-ping {
+  background: transparent !important;
+  border: none !important;
+}
+
+.hero-target-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.target-center-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 2;
+}
+
+.target-radar-ring {
+  position: absolute;
+  left: -15px;
+  top: -15px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--ring-color, #ff1744);
+  animation: heroRadarPulse 2s ease-out infinite;
+  pointer-events: none;
+}
+
+@keyframes heroRadarPulse {
+  0% { transform: scale(0.4); opacity: 1; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+
+.target-label-tag {
+  background: rgba(9, 14, 26, 0.92);
+  backdrop-filter: blur(8px);
+  border: 1px solid;
+  border-radius: 16px;
+  padding: 4px 10px;
+  font-size: 10px;
+  font-weight: 800;
+  white-space: nowrap;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+  letter-spacing: 0.5px;
+  transition: transform 0.2s;
+}
+
+.hero-target-wrap:hover .target-label-tag {
+  transform: scale(1.08);
 }
 
 /* Map Hazard Ping Badges */
