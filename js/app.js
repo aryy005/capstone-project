@@ -56,6 +56,9 @@ class Application {
     
     // Request push notifications
     this.alerts.requestPushPermission();
+
+    // Initial View: Standalone Landing Portal
+    this.switchView('landing');
   }
 
   initTheme() {
@@ -291,6 +294,12 @@ class Application {
 
   switchView(viewId) {
     this.currentView = viewId;
+
+    // Toggle landing mode on #app (hides app sidebar and topbar on landing page)
+    const appEl = document.getElementById('app');
+    if (appEl) {
+      appEl.classList.toggle('is-landing', viewId === 'landing');
+    }
 
     // Update nav active state
     document.querySelectorAll('.nav-item[data-view]').forEach(el => {

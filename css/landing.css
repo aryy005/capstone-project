@@ -1,5 +1,14 @@
 /* ===== SENTINEL AI LANDING PAGE STYLES ===== */
 
+/* Standalone Full-Screen Mode for Landing Page */
+#app.is-landing #sidebar {
+  display: none !important;
+}
+
+#app.is-landing #topbar {
+  display: none !important;
+}
+
 #landing-view {
   display: flex;
   flex-direction: column;
