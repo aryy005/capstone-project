@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AEGIS — AI Emergency Response &amp; Disaster Management Platform</title>
-  <meta name="description" content="AEGIS: AI-powered real-time Emergency Response and Disaster Management Platform using Bayesian Inference, A* Pathfinding, K-Means++, Decision Tree, and Monte Carlo simulation.">
+  <title>Sentinel AI — AI Emergency Response &amp; Disaster Management Platform</title>
+  <meta name="description" content="Sentinel AI: AI-powered real-time Emergency Response and Disaster Management Platform using Bayesian Inference, A* Pathfinding, K-Means++, Decision Tree, and Monte Carlo simulation.">
   <meta name="keywords" content="AI, Emergency Response, Disaster Management, Bayesian Network, A-Star, K-Means, Monte Carlo">
 
   <!-- Google Fonts -->
@@ -46,10 +46,10 @@
 
     <!-- ===== SIDEBAR ===== -->
     <aside id="sidebar">
-      <div class="sidebar-logo" onclick="window.DP.App.switchView('dashboard')" style="cursor: pointer;" title="AEGIS AI Command Center">
+      <div class="sidebar-logo" onclick="window.DP.App.switchView('dashboard')" style="cursor: pointer;" title="Sentinel AI Command Center">
         <div class="logo-icon">🛡️</div>
         <div class="logo-text">
-          <div class="logo-name">AEGIS AI</div>
+          <div class="logo-name">Sentinel AI</div>
           <div class="logo-sub">EMERGENCY INTELLIGENCE</div>
         </div>
       </div>
@@ -138,7 +138,7 @@
           <span style="font-size:18px;">☰</span>
         </button>
         <div class="topbar-title">
-          AEGIS Command — <span>Emergency Operations</span>
+          Sentinel AI Command — <span>Emergency Operations</span>
         </div>
 
         <div class="alert-ticker">
@@ -176,7 +176,7 @@
       <!-- ===== VIEW CONTAINERS ===== -->
       <div id="views-wrapper">
 
-        <!-- 0. AEGIS AI LANDING VIEW -->
+        <!-- 0. SENTINEL AI LANDING VIEW -->
         <div id="landing-view" class="view-container" style="display: flex;">
           <div class="landing-container">
             
@@ -185,7 +185,7 @@
               <div class="landing-logo" onclick="window.DP.App.switchView('landing')">
                 <div class="landing-logo-icon">🛡️</div>
                 <div class="landing-logo-text">
-                  <div class="landing-logo-title">AEGIS AI</div>
+                  <div class="landing-logo-title">Sentinel AI</div>
                   <div class="landing-logo-sub">EMERGENCY INTELLIGENCE SYSTEM</div>
                 </div>
               </div>
@@ -224,7 +224,7 @@
                   <span class="highlight">A CRISIS.</span>
                 </h1>
                 <p class="hero-subtitle">
-                  AEGIS AI detects, predicts, and helps respond to emergencies faster with intelligent insights and real-time coordination.
+                  Sentinel AI detects, predicts, and helps respond to emergencies faster with intelligent insights and real-time coordination.
                 </p>
                 <div class="hero-actions">
                   <button class="btn-hero-primary" onclick="window.DP.App.switchView('dashboard')">
@@ -331,7 +331,7 @@
                 <div class="intel-text">
                   <div class="intel-title">INTELLIGENCE THAT MAKES A DIFFERENCE</div>
                   <div class="intel-desc">
-                    AEGIS AI uses advanced AI models, IoT data, satellite imagery, and citizen reports to deliver real-time intelligence and save lives.
+                    Sentinel AI uses advanced AI models, IoT data, satellite imagery, and citizen reports to deliver real-time intelligence and save lives.
                   </div>
                 </div>
               </div>
@@ -355,10 +355,10 @@
               </div>
             </div>
 
-            <!-- WORKFLOW GRID: HOW AEGIS AI WORKS -->
+            <!-- WORKFLOW GRID: HOW SENTINEL AI WORKS -->
             <section class="workflow-section">
               <div class="workflow-header">
-                <div class="workflow-title">HOW AEGIS AI WORKS</div>
+                <div class="workflow-title">HOW SENTINEL AI WORKS</div>
                 <div class="workflow-sub">Detect. Predict. Decide. Respond.</div>
               </div>
               <div class="workflow-grid">
@@ -706,6 +706,15 @@
               </button>
               <button class="map-ctrl-btn" id="btn-toggle-heatmap" onclick="window.DP.App.ui.map.toggleHeatmap(window.DP.App.simulator.incidents)">
                 <span class="map-ctrl-icon">🔥</span> Incident Heatmap
+              </button>
+              <button class="map-ctrl-btn" id="btn-toggle-mcoverlay" onclick="window.DP.App.ui.map.toggleMonteCarloOverlay()">
+                <span class="map-ctrl-icon">📈</span> Monte Carlo Risk Prediction
+              </button>
+              <button class="map-ctrl-btn active" id="btn-toggle-safezones" onclick="window.DP.App.ui.map.toggleLayer('safeZones')">
+                <span class="map-ctrl-icon">🏥</span> Safe Zones & Shelters
+              </button>
+              <button class="map-ctrl-btn active" id="btn-toggle-evacpoints" onclick="window.DP.App.ui.map.toggleLayer('evacuationPoints')">
+                <span class="map-ctrl-icon">🚩</span> Evacuation Pickup Points
               </button>
             </div>
           </div>
@@ -1071,7 +1080,7 @@
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./service-worker.js')
-          .then(reg => console.log('⚡ AEGIS PWA: ServiceWorker active', reg.scope))
+          .then(reg => console.log('⚡ Sentinel AI PWA: ServiceWorker active', reg.scope))
           .catch(err => console.warn('PWA ServiceWorker registration failed:', err));
       });
     }

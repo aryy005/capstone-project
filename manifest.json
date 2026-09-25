@@ -1,6 +1,6 @@
 {
-  "name": "AEGIS — Emergency Operations & Disaster Management Platform",
-  "short_name": "AEGIS AI",
+  "name": "Sentinel AI — Emergency Operations & Disaster Management Platform",
+  "short_name": "Sentinel AI",
   "description": "AI-Enabled Emergency Response & Disaster Management Platform",
   "start_url": "./index.html",
   "display": "standalone",

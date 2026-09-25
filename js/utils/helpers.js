@@ -130,7 +130,7 @@ window.DP.Helpers = {
     const capPayload = {
       "$schema": "OASIS Common Alerting Protocol v1.2 (CAP-IN NDRF Spec)",
       "identifier": `NDRF-IN-${Date.now()}`,
-      "sender": "AEGIS.AI.DISASTER.PLATFORM",
+      "sender": "SENTINEL.AI.DISASTER.PLATFORM",
       "sent": new Date().toISOString(),
       "status": "Actual",
       "msgType": "Alert",

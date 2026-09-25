@@ -1,4 +1,4 @@
-# 🚨 AEGIS — AI Enabled Emergency Response & Disaster Management Platform
+# 🚨 Sentinel AI — AI Enabled Emergency Response & Disaster Management Platform
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Build](https://img.shields.io/badge/build-passing-brightgreen.svg)
@@ -6,7 +6,7 @@
 ![PWA-Ready](https://img.shields.io/badge/PWA-Installable-00d4ff.svg)
 ![NDRF-CAP](https://img.shields.io/badge/CAP-v1.2%20Compliant-ff1744.svg)
 
-**AEGIS** (*AI Emergency Guardian & Intelligence System*) is a real-time, browser-native disaster management and emergency response platform powered by client-side AI algorithms, live meteorological REST APIs, 2D/3D GIS mapping engines, and standardized OASIS CAP alert dispatch protocols.
+**Sentinel AI** (*AI Emergency Guardian & Intelligence System*) is a real-time, browser-native disaster management and emergency response platform powered by client-side AI algorithms, live meteorological REST APIs, 2D/3D GIS mapping engines, and standardized OASIS CAP alert dispatch protocols.
 
 ---
 

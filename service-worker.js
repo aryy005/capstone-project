@@ -1,4 +1,4 @@
-const CACHE_NAME = 'aegis-v2';
+const CACHE_NAME = 'sentinel-v2';
 
 self.addEventListener('install', event => {
   self.skipWaiting();

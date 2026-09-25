@@ -51,6 +51,11 @@ window.DP.DataSimulator = class {
     this.listeners[event].push(fn);
   }
 
+  off(event, fn) {
+    if (!this.listeners[event]) return;
+    this.listeners[event] = this.listeners[event].filter(f => f !== fn);
+  }
+
   emit(event, data) {
     (this.listeners[event] || []).forEach(fn => fn(data));
   }
@@ -281,8 +286,9 @@ window.DP.DataSimulator = class {
     let text = window.DP.Helpers.randChoice(templates);
 
     const unit = window.DP.Helpers.randChoice(this.resourceNames);
+    const incidentsList = (this.activeScenario?.incidents?.length > 0) ? this.activeScenario.incidents : [{ title: 'Incident Zone' }];
     const location = this.activeScenario
-      ? window.DP.Helpers.randChoice(this.activeScenario.incidents || [{ title: 'Incident Zone' }]).title
+      ? window.DP.Helpers.randChoice(incidentsList).title
       : 'Sector 7';
     text = text
       .replace('{unit}', unit)

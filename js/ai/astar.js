@@ -133,6 +133,10 @@ window.DP.AStarRouter = class {
 
   // Generate multiple evacuation corridors
   generateEvacuationCorridors(evacuationPoints, safeZones, hazards, bounds) {
+    if (!evacuationPoints || evacuationPoints.length === 0 || !safeZones || safeZones.length === 0) {
+      this.routes = [];
+      return [];
+    }
     const routes = [];
     evacuationPoints.forEach((ep, i) => {
       const targetZone = safeZones[i % safeZones.length];

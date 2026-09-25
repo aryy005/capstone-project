@@ -8,7 +8,10 @@ window.DP.MapManager = class {
     this.routePolylines = [];
     this.hazardCircles = [];
     this.stagingMarkers = [];
+    this.safeZoneMarkers = [];
+    this.evacPointMarkers = [];
     this.heatmapLayer = null;
+    this.monteCarloHeatmapLayer = null;
     this.is3DMode = false;
     this.cesiumViewer = null;
     this.layers = {
@@ -17,7 +20,10 @@ window.DP.MapManager = class {
       routes: true,
       hazards: true,
       staging: true,
-      heatmap: false
+      heatmap: false,
+      monteCarlo: true,
+      safeZones: true,
+      evacuationPoints: true
     };
   }
 
@@ -52,6 +58,39 @@ window.DP.MapManager = class {
       attribution: window.DP.CONSTANTS.MAP.TILE_ATTRIBUTION,
       maxZoom:     window.DP.CONSTANTS.MAP.MAX_ZOOM
     }).addTo(this.map);
+    
+    this._createLegend();
+  }
+
+  _createLegend() {
+    if (!this.map) return;
+    const legend = L.control({ position: 'bottomright' });
+    legend.onAdd = function(map) {
+      const div = L.DomUtil.create('div', 'info legend');
+      div.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+      div.style.padding = '10px';
+      div.style.borderRadius = '5px';
+      div.style.color = 'white';
+      div.style.fontSize = '12px';
+      
+      div.innerHTML = `
+        <h4 style="margin: 0 0 5px 0">Map Legend</h4>
+        <div style="margin-bottom: 3px"><span style="display:inline-block; width:12px; height:12px; background:#00e676; border-radius:50%; margin-right:5px;"></span>L1-L2 (Low)</div>
+        <div style="margin-bottom: 3px"><span style="display:inline-block; width:12px; height:12px; background:#ffd600; border-radius:50%; margin-right:5px;"></span>L3 (Moderate)</div>
+        <div style="margin-bottom: 3px"><span style="display:inline-block; width:12px; height:12px; background:#ff6d00; border-radius:50%; margin-right:5px;"></span>L4 (High)</div>
+        <div style="margin-bottom: 3px"><span style="display:inline-block; width:12px; height:12px; background:#ff1744; border-radius:50%; margin-right:5px;"></span>L5 (Critical)</div>
+        <hr style="border-color:#555; margin: 5px 0;">
+        <div style="margin-bottom: 3px">📦 Resource</div>
+        <div style="margin-bottom: 3px">⛺ Staging Area</div>
+        <div style="margin-bottom: 3px">🛡️ Safe Zone</div>
+        <div style="margin-bottom: 3px">📍 Evacuation Point</div>
+        <hr style="border-color:#555; margin: 5px 0;">
+        <div style="margin-bottom: 3px"><span style="display:inline-block; width:12px; height:12px; border:2px dashed #ff1744; border-radius:50%; margin-right:5px;"></span>Hazard Zone</div>
+        <div style="margin-bottom: 3px"><span style="display:inline-block; width:12px; height:4px; background:#00e676; margin-right:5px;"></span>Evac Route</div>
+      `;
+      return div;
+    };
+    legend.addTo(this.map);
   }
 
   setThemeTile(theme) {
@@ -81,31 +120,108 @@ window.DP.MapManager = class {
 
   toggle3DMode() {
     this.is3DMode = !this.is3DMode;
+    const mapContainer = document.getElementById(this._containerId || 'map');
+    const cesiumContainer = document.getElementById('cesiumContainer');
     const mapView = document.getElementById('map-view');
     const btn = document.getElementById('btn-toggle-3d');
 
     if (this.is3DMode) {
-      if (mapView) mapView.classList.add('perspective-3d');
       if (btn) btn.innerHTML = '<span class="map-ctrl-icon">🗺️</span> Switch to 2D Flat Map';
-    } else {
-      if (mapView) mapView.classList.remove('perspective-3d');
-      if (btn) btn.innerHTML = '<span class="map-ctrl-icon">🌐</span> Switch to 3D Tactical Perspective';
-    }
 
-    if (this.map) {
-      setTimeout(() => this.map.invalidateSize(), 350);
+      if (!this.cesiumViewer && window.Cesium) {
+        try {
+          // Disable Cesium Ion token requirement completely
+          window.Cesium.Ion.defaultAccessToken = '';
+
+          this.cesiumViewer = new window.Cesium.Viewer('cesiumContainer', {
+            baseLayer: false,
+            terrainProvider: undefined,
+            baseLayerPicker: false,
+            geocoder: false,
+            homeButton: false,
+            sceneModePicker: false,
+            timeline: false,
+            animation: false,
+            fullscreenButton: false,
+            navigationHelpButton: false,
+            infoBox: false,
+            selectionIndicator: false,
+            creditContainer: document.createElement('div')
+          });
+
+          // Add free open CartoDB tile layer (no API key needed)
+          const theme = document.body.getAttribute('data-theme') || 'dark';
+          const tilePath = theme === 'light' ? 'rastertiles/voyager' : 'dark_all';
+          const imageryProvider = new window.Cesium.UrlTemplateImageryProvider({
+            url: `https://{s}.basemaps.cartocdn.com/${tilePath}/{z}/{x}/{y}.png`,
+            subdomains: ['a', 'b', 'c', 'd'],
+            maximumLevel: 18
+          });
+          this.cesiumViewer.imageryLayers.addImageryProvider(imageryProvider);
+        } catch (err) {
+          console.warn("Cesium 3D Globe fallback to CSS 3D perspective:", err);
+          this.cesiumViewer = null;
+        }
+      }
+
+      if (this.cesiumViewer && window.Cesium) {
+        if (mapContainer) mapContainer.style.display = 'none';
+        if (cesiumContainer) cesiumContainer.style.display = 'block';
+
+        const center = this.map ? [this.map.getCenter().lat, this.map.getCenter().lng] : this._pendingCenter;
+        if (center) {
+          this.cesiumViewer.camera.flyTo({
+            destination: window.Cesium.Cartesian3.fromDegrees(center[1], center[0], 35000),
+            duration: 1.5
+          });
+        }
+        
+        // Add incident entities to 3D globe
+        this.cesiumViewer.entities.removeAll();
+        this.markers.forEach((marker, id) => {
+          const latlng = marker.getLatLng();
+          this.cesiumViewer.entities.add({
+            position: window.Cesium.Cartesian3.fromDegrees(latlng.lng, latlng.lat),
+            point: {
+              pixelSize: 12,
+              color: window.Cesium.Color.fromCssColorString('#ff1744'),
+              outlineColor: window.Cesium.Color.WHITE,
+              outlineWidth: 2
+            }
+          });
+        });
+      } else {
+        // Fallback to CSS 3D perspective on Leaflet map if Cesium is unavailable
+        if (mapView) mapView.classList.add('perspective-3d');
+        if (mapContainer) mapContainer.style.display = 'block';
+        if (cesiumContainer) cesiumContainer.style.display = 'none';
+        if (this.map) setTimeout(() => this.map.invalidateSize(), 150);
+      }
+    } else {
+      if (btn) btn.innerHTML = '<span class="map-ctrl-icon">🌐</span> Switch to 3D Tactical Perspective';
+      if (mapView) mapView.classList.remove('perspective-3d');
+      if (cesiumContainer) cesiumContainer.style.display = 'none';
+      if (mapContainer) mapContainer.style.display = 'block';
+      if (this.map) {
+        setTimeout(() => this.map.invalidateSize(), 100);
+      }
     }
   }
 
   render(data) {
     if (!this.map) return;
     const { incidents, resources, scenario, ai } = data;
+    this._lastData = data; // Store data for toggling layers
 
     if (this.layers.incidents) this.renderIncidents(incidents);
     if (this.layers.resources) this.renderResources(resources);
     if (this.layers.hazards && scenario?.hazardZones) this.renderHazards(scenario.hazardZones);
     if (this.layers.routes && ai?.astar) this.renderEvacuationCorridors(ai.astar.routes);
     if (this.layers.staging && ai?.kmeans) this.renderStagingAreas(ai.kmeans.clusters);
+    
+    if (this.layers.safeZones && scenario?.safeZones) this.renderSafeZones(scenario.safeZones);
+    if (this.layers.evacuationPoints && scenario?.evacuationPoints) this.renderEvacuationPoints(scenario.evacuationPoints);
+    if (this.layers.monteCarlo && ai?.monteCarlo) this.renderMonteCarloOverlay(ai.monteCarlo, scenario);
 
     // Refresh heatmap if active
     if (this.layers.heatmap && this.heatmapLayer) {
@@ -145,6 +261,7 @@ window.DP.MapManager = class {
       if (this.markers.has(inc.id)) {
         const marker = this.markers.get(inc.id);
         marker.setLatLng([inc.lat, inc.lng]);
+        marker.setIcon(customIcon);
       } else {
         const marker = L.marker([inc.lat, inc.lng], { icon: customIcon }).addTo(this.map);
         
@@ -270,6 +387,73 @@ window.DP.MapManager = class {
     });
   }
 
+  renderSafeZones(safeZones) {
+    this.clearSafeZones();
+    if (!safeZones) return;
+
+    safeZones.forEach(sz => {
+      const icon = L.divIcon({
+        className: 'safe-zone-wrap',
+        html: `<div style="background:#00e676; border-radius:50%; width:24px; height:24px; display:flex; align-items:center; justify-content:center; color:white; border:2px solid white;">🛡️</div>`,
+        iconSize: [24, 24],
+        iconAnchor: [12, 12]
+      });
+
+      const marker = L.marker([sz.lat, sz.lng], { icon }).addTo(this.map);
+      marker.bindTooltip(`Safe Zone: ${sz.name || 'Shelter'}`, { permanent: false });
+      this.safeZoneMarkers.push(marker);
+    });
+  }
+
+  renderEvacuationPoints(evacuationPoints) {
+    this.clearEvacuationPoints();
+    if (!evacuationPoints) return;
+
+    evacuationPoints.forEach(ep => {
+      const icon = L.divIcon({
+        className: 'evac-point-wrap',
+        html: `<div style="background:#ff6d00; border-radius:50%; width:24px; height:24px; display:flex; align-items:center; justify-content:center; color:white; border:2px solid white;">📍</div>`,
+        iconSize: [24, 24],
+        iconAnchor: [12, 12]
+      });
+
+      const marker = L.marker([ep.lat, ep.lng], { icon }).addTo(this.map);
+      marker.bindTooltip(`Evacuation Point: ${ep.name || 'Pickup'}`, { permanent: false });
+      this.evacPointMarkers.push(marker);
+    });
+  }
+
+  renderMonteCarloOverlay(monteCarlo, scenario) {
+    if (this.monteCarloHeatmapLayer) {
+      this.map.removeLayer(this.monteCarloHeatmapLayer);
+      this.monteCarloHeatmapLayer = null;
+    }
+    const results = monteCarlo?.results;
+    if (!results || !results.heatmapPoints || !window.L.heatLayer) return;
+
+    this.monteCarloHeatmapLayer = L.heatLayer(results.heatmapPoints, {
+      radius: 40,
+      blur: 25,
+      maxZoom: 14,
+      gradient: { 0.4: '#9c27b0', 0.6: '#e91e63', 0.8: '#ff5252', 1.0: '#b71c1c' }
+    }).addTo(this.map);
+  }
+
+  toggleMonteCarloOverlay() {
+    this.layers.monteCarlo = !this.layers.monteCarlo;
+    const btn = document.getElementById('btn-toggle-mcoverlay');
+
+    if (!this.layers.monteCarlo) {
+      if (this.monteCarloHeatmapLayer) { this.map.removeLayer(this.monteCarloHeatmapLayer); this.monteCarloHeatmapLayer = null; }
+      if (btn) { btn.classList.remove('active'); btn.style.background = ''; }
+    } else {
+      if (this._lastData?.ai?.monteCarlo) {
+        this.renderMonteCarloOverlay(this._lastData.ai.monteCarlo, this._lastData.scenario);
+      }
+      if (btn) { btn.classList.add('active'); btn.style.background = 'rgba(156,39,176,0.2)'; }
+    }
+  }
+
   clearHazards() {
     this.hazardCircles.forEach(c => this.map.removeLayer(c));
     this.hazardCircles = [];
@@ -283,6 +467,16 @@ window.DP.MapManager = class {
   clearStaging() {
     this.stagingMarkers.forEach(m => this.map.removeLayer(m));
     this.stagingMarkers = [];
+  }
+
+  clearSafeZones() {
+    this.safeZoneMarkers.forEach(m => this.map.removeLayer(m));
+    this.safeZoneMarkers = [];
+  }
+
+  clearEvacuationPoints() {
+    this.evacPointMarkers.forEach(m => this.map.removeLayer(m));
+    this.evacPointMarkers = [];
   }
 
   toggleHeatmap(incidents) {
@@ -308,8 +502,34 @@ window.DP.MapManager = class {
 
   toggleLayer(layerName, state) {
     this.layers[layerName] = state !== undefined ? state : !this.layers[layerName];
-    if (!this.layers.hazards) this.clearHazards();
-    if (!this.layers.routes) this.clearRoutes();
-    if (!this.layers.staging) this.clearStaging();
+    
+    // Toggle button state visually
+    const buttons = document.querySelectorAll('.layer-btn, button');
+    buttons.forEach(btn => {
+      if (btn.dataset.layer === layerName || (btn.onclick && btn.onclick.toString().includes(`'${layerName}'`)) || (btn.getAttribute('onclick') && btn.getAttribute('onclick').includes(`'${layerName}'`))) {
+        if (this.layers[layerName]) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      }
+    });
+
+    // Re-render or clear depending on state
+    if (!this.layers[layerName]) {
+      if (layerName === 'hazards') this.clearHazards();
+      if (layerName === 'routes') this.clearRoutes();
+      if (layerName === 'staging') this.clearStaging();
+      if (layerName === 'safeZones') this.clearSafeZones();
+      if (layerName === 'evacuationPoints') this.clearEvacuationPoints();
+      if (layerName === 'monteCarlo' && this.monteCarloHeatmapLayer) {
+        this.map.removeLayer(this.monteCarloHeatmapLayer);
+        this.monteCarloHeatmapLayer = null;
+      }
+    } else {
+      if (this._lastData) {
+        this.render(this._lastData);
+      }
+    }
   }
 };

@@ -16,6 +16,8 @@ window.DP.AlertSystem = class {
       const perm = await Notification.requestPermission();
       if (perm === 'granted') {
         this.show('Notifications Enabled', 'You will receive alerts for critical incidents.', 'INFO', '🔔', 4000);
+      } else if (perm === 'denied') {
+        this.show('Notifications Blocked', 'Critical background alerts are disabled. Enable notifications in browser settings for full functionality.', 'MODERATE', '⚠️', 6000);
       }
     }
   }
@@ -25,11 +27,11 @@ window.DP.AlertSystem = class {
     // Don't push if tab is visible
     if (!document.hidden) return;
     try {
-      new Notification(`AEGIS: ${title}`, {
+      new Notification(`Sentinel AI: ${title}`, {
         body,
         icon: '/favicon.ico',
         badge: '/favicon.ico',
-        tag: 'aegis-alert'
+        tag: 'sentinel-alert'
       });
     } catch(e) {}
   }

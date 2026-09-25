@@ -29,7 +29,7 @@ class Application {
   }
 
   init() {
-    console.log('⚡ Initializing AEGIS Platform...');
+    console.log('⚡ Initializing Sentinel AI Platform...');
 
     // Initialize UI components
     this.ui.dashboard.init();
@@ -62,14 +62,14 @@ class Application {
   }
 
   initTheme() {
-    const savedTheme = localStorage.getItem('aegis-theme') || 'dark';
+    const savedTheme = localStorage.getItem('sentinel-theme') || 'dark';
     this.setTheme(savedTheme);
   }
 
   setTheme(theme) {
     this.currentTheme = theme;
     document.body.setAttribute('data-theme', theme);
-    localStorage.setItem('aegis-theme', theme);
+    localStorage.setItem('sentinel-theme', theme);
 
     const iconEl = document.getElementById('theme-toggle-icon');
     if (iconEl) {
@@ -225,6 +225,7 @@ class Application {
     const criticalCount = this.simulator.incidents.filter(i => i.severity >= 5).length;
     if (badgeEl) badgeEl.textContent = criticalCount > 0 ? criticalCount : '';
 
+    const stats = this.simulator.getStats();
     const landAct = document.getElementById('landing-live-active');
     const landCrit = document.getElementById('landing-live-crit');
     const landUnits = document.getElementById('landing-live-units');
