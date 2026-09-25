@@ -67,26 +67,30 @@ window.DP.MapManager = class {
     const legend = L.control({ position: 'bottomright' });
     legend.onAdd = function(map) {
       const div = L.DomUtil.create('div', 'info legend');
-      div.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
-      div.style.padding = '10px';
-      div.style.borderRadius = '5px';
-      div.style.color = 'white';
-      div.style.fontSize = '12px';
+      div.style.backgroundColor = 'rgba(7, 10, 20, 0.88)';
+      div.style.backdropFilter = 'blur(10px)';
+      div.style.border = '1px solid rgba(255, 255, 255, 0.15)';
+      div.style.padding = '10px 14px';
+      div.style.borderRadius = '8px';
+      div.style.color = '#e2e8f0';
+      div.style.fontSize = '11px';
+      div.style.fontFamily = 'Inter, sans-serif';
+      div.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.6)';
       
       div.innerHTML = `
-        <h4 style="margin: 0 0 5px 0">Map Legend</h4>
-        <div style="margin-bottom: 3px"><span style="display:inline-block; width:12px; height:12px; background:#00e676; border-radius:50%; margin-right:5px;"></span>L1-L2 (Low)</div>
-        <div style="margin-bottom: 3px"><span style="display:inline-block; width:12px; height:12px; background:#ffd600; border-radius:50%; margin-right:5px;"></span>L3 (Moderate)</div>
-        <div style="margin-bottom: 3px"><span style="display:inline-block; width:12px; height:12px; background:#ff6d00; border-radius:50%; margin-right:5px;"></span>L4 (High)</div>
-        <div style="margin-bottom: 3px"><span style="display:inline-block; width:12px; height:12px; background:#ff1744; border-radius:50%; margin-right:5px;"></span>L5 (Critical)</div>
-        <hr style="border-color:#555; margin: 5px 0;">
-        <div style="margin-bottom: 3px">📦 Resource</div>
-        <div style="margin-bottom: 3px">⛺ Staging Area</div>
-        <div style="margin-bottom: 3px">🛡️ Safe Zone</div>
-        <div style="margin-bottom: 3px">📍 Evacuation Point</div>
-        <hr style="border-color:#555; margin: 5px 0;">
-        <div style="margin-bottom: 3px"><span style="display:inline-block; width:12px; height:12px; border:2px dashed #ff1744; border-radius:50%; margin-right:5px;"></span>Hazard Zone</div>
-        <div style="margin-bottom: 3px"><span style="display:inline-block; width:12px; height:4px; background:#00e676; margin-right:5px;"></span>Evac Route</div>
+        <div style="font-weight: 700; color: #00d4ff; margin-bottom: 6px; letter-spacing: 0.5px; text-transform: uppercase;">Tactical Legend</div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3px 10px; margin-bottom: 6px;">
+          <div><span style="display:inline-block; width:9px; height:9px; background:#00e676; border-radius:50%; margin-right:5px;"></span>L1-L2 Low</div>
+          <div><span style="display:inline-block; width:9px; height:9px; background:#ffd600; border-radius:50%; margin-right:5px;"></span>L3 Moderate</div>
+          <div><span style="display:inline-block; width:9px; height:9px; background:#ff6d00; border-radius:50%; margin-right:5px;"></span>L4 Severe</div>
+          <div><span style="display:inline-block; width:9px; height:9px; background:#ff1744; border-radius:50%; margin-right:5px;"></span>L5 Critical</div>
+        </div>
+        <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 5px; font-size: 10px; color: #94a3b8; display: flex; flex-direction: column; gap: 2px;">
+          <div>🛡️ Safe Relief Camp &nbsp; 📍 Pickup Point</div>
+          <div>⛺ AI Staging Hub &nbsp;&nbsp;&nbsp;&nbsp; 📦 Deployed Unit</div>
+          <div style="color: #00e676; font-weight: 600;">═══ A* Safe Evacuation Corridor</div>
+          <div style="color: #ff1744; font-weight: 600;">- - - Active Danger Perimeter</div>
+        </div>
       `;
       return div;
     };
@@ -293,7 +297,11 @@ window.DP.MapManager = class {
   }
 
   renderResources(resources) {
-    const currentIds = new Set(resources.map(r => r.id));
+    // Display only active DEPLOYED tactical units on the map (up to 20 units)
+    // to keep the tactical GIS display crisp, clean, and legible
+    const displayUnits = (resources || []).filter(r => r.status === 'DEPLOYED').slice(0, 20);
+    const currentIds = new Set(displayUnits.map(r => r.id));
+
     this.resourceMarkers.forEach((marker, id) => {
       if (!currentIds.has(id)) {
         this.map.removeLayer(marker);
@@ -301,22 +309,24 @@ window.DP.MapManager = class {
       }
     });
 
-    resources.forEach(res => {
+    displayUnits.forEach(res => {
       const typeConfig = window.DP.CONSTANTS.RESOURCE_TYPES[res.type?.toUpperCase()] || { icon: '📦' };
       const statusClass = res.status.toLowerCase();
 
       const iconHtml = L.divIcon({
         className: 'resource-marker-wrap',
-        html: `<div class="resource-marker ${statusClass}">${typeConfig.icon}</div>`,
-        iconSize: [24, 24],
-        iconAnchor: [12, 12]
+        html: `<div class="resource-marker ${statusClass}" title="${res.name} (${res.type})">${typeConfig.icon}</div>`,
+        iconSize: [26, 26],
+        iconAnchor: [13, 13]
       });
 
       if (this.resourceMarkers.has(res.id)) {
-        this.resourceMarkers.get(res.id).setLatLng([res.lat, res.lng]);
+        const marker = this.resourceMarkers.get(res.id);
+        marker.setLatLng([res.lat, res.lng]);
+        marker.setIcon(iconHtml);
       } else {
         const marker = L.marker([res.lat, res.lng], { icon: iconHtml }).addTo(this.map);
-        marker.bindPopup(`<strong>${res.name}</strong><br>Type: ${res.type}<br>Status: ${res.status}`);
+        marker.bindPopup(`<strong>${res.name}</strong><br>Unit: ${res.type}<br>Status: <span style="color:#00e676;font-weight:700;">${res.status}</span><br>Fuel: ${Math.round(res.fuel * 100)}%`);
         this.resourceMarkers.set(res.id, marker);
       }
     });

@@ -70,7 +70,7 @@ window.DP.DataSimulator = class {
       updatedAt: Date.now(),
       classification: window.DP.App?.ai?.decisionTree?.classify(inc) || { severityLabel: 'HIGH', protocol: 'Full Response' }
     }));
-    this.resources = this._generateResources(scenario.resources, scenario.center);
+    this.resources = this._generateResources(scenario.resources, scenario.center, scenario);
     this.weatherData = { ...scenario.weatherParams };
     this._generateInitialComms(scenario);
     this.emit('scenarioLoaded', { scenario, incidents: this.incidents, resources: this.resources });
@@ -105,24 +105,67 @@ window.DP.DataSimulator = class {
     }
   }
 
-  _generateResources(counts, center) {
+  _generateResources(counts, center, scenario) {
     const resources = [];
     const types = window.DP.CONSTANTS.RESOURCE_TYPES;
-    const statuses = ['DEPLOYED', 'DEPLOYED', 'DEPLOYED', 'STANDBY', 'STANDBY'];
     let nameIdx = 0;
 
+    const landBounds = scenario?.landBounds || {
+      minLat: center[0] - 0.15, maxLat: center[0] + 0.15,
+      minLng: center[1] - 0.15, maxLng: center[1] + 0.15
+    };
+
+    // Designated land staging bases & emergency road depots
+    const bases = scenario?.stagingBases || [
+      { name: 'District Emergency Command', lat: center[0], lng: center[1] },
+      { name: 'Regional Medical Depot', lat: center[0] - 0.03, lng: center[1] - 0.02 },
+      { name: 'Fire & Rescue Sector Base', lat: center[0] + 0.03, lng: center[1] - 0.03 }
+    ];
+
+    // Tactical active field deployment quotas for the map
+    const maxDeployedByType = {
+      AMBULANCE: 6,
+      FIRE_ENGINE: 4,
+      RESCUE_TEAM: 5,
+      HELICOPTER: 2,
+      MEDICAL_UNIT: 2,
+      SUPPLY_TRUCK: 3
+    };
+
     const addResources = (type, count) => {
+      const maxDeployed = maxDeployedByType[type] || 2;
+      let deployedCount = 0;
+
       for (let i = 0; i < count; i++) {
-        const [lat, lng] = window.DP.Helpers.randomLatLng(center[0], center[1], 30);
+        const isDeployed = deployedCount < maxDeployed;
+        if (isDeployed) deployedCount++;
+
+        let lat, lng;
+        if (isDeployed && scenario?.incidents?.length > 0) {
+          // Deployed units are positioned realistically on land near active incidents or safe routes
+          const targetInc = scenario.incidents[i % scenario.incidents.length];
+          lat = targetInc.lat + window.DP.Helpers.rand(-0.012, 0.012);
+          lng = targetInc.lng + window.DP.Helpers.rand(-0.022, -0.006); // strictly inland
+        } else {
+          // Standby units are stationed at legitimate emergency bases & depots on land
+          const base = bases[i % bases.length];
+          lat = base.lat + window.DP.Helpers.rand(-0.007, 0.007);
+          lng = base.lng + window.DP.Helpers.rand(-0.007, 0.007);
+        }
+
+        // Strict clamp to land bounds (guarantees zero ocean coordinates)
+        lat = window.DP.Helpers.clamp(lat, landBounds.minLat, landBounds.maxLat);
+        lng = window.DP.Helpers.clamp(lng, landBounds.minLng, landBounds.maxLng);
+
         resources.push({
           id: window.DP.Helpers.uid('res'),
           type,
           name: this.resourceNames[nameIdx++ % this.resourceNames.length] + '-' + type.slice(0,2).toUpperCase(),
           lat, lng,
-          status: window.DP.Helpers.randChoice(statuses),
-          fuel: window.DP.Helpers.rand(0.4, 1.0),
+          status: isDeployed ? 'DEPLOYED' : 'STANDBY',
+          fuel: window.DP.Helpers.rand(0.70, 1.0),
           capacity: types[type.toUpperCase().replace(/_/g, '_')]?.capacity || 4,
-          assignedTo: null,
+          assignedTo: isDeployed && scenario?.incidents ? scenario.incidents[i % scenario.incidents.length].id : null,
           lastUpdate: Date.now()
         });
       }
@@ -256,7 +299,14 @@ window.DP.DataSimulator = class {
   _generateNewIncident() {
     if (!this.activeScenario) return null;
     const center = this.activeScenario.center;
-    const [lat, lng] = window.DP.Helpers.randomLatLng(center[0], center[1], 40);
+    const bounds = this.activeScenario.landBounds;
+    let lat, lng;
+    if (bounds) {
+      lat = window.DP.Helpers.rand(bounds.minLat + 0.02, bounds.maxLat - 0.02);
+      lng = window.DP.Helpers.rand(bounds.minLng + 0.02, bounds.maxLng - 0.02);
+    } else {
+      [lat, lng] = window.DP.Helpers.randomLatLng(center[0], center[1], 15);
+    }
     const types = Object.keys(window.DP.CONSTANTS.DISASTER_TYPES);
     const disasterType = this.activeScenario.disasterType || window.DP.Helpers.randChoice(types).toLowerCase();
     const severity = window.DP.Helpers.randInt(1, 4);
@@ -308,11 +358,16 @@ window.DP.DataSimulator = class {
   }
 
   _updateResourcePositions() {
+    const bounds = this.activeScenario?.landBounds;
     this.resources.forEach(res => {
       if (res.status === 'DEPLOYED') {
-        res.lat += window.DP.Helpers.rand(-0.005, 0.005);
-        res.lng += window.DP.Helpers.rand(-0.005, 0.005);
-        res.fuel = Math.max(0.05, res.fuel - window.DP.Helpers.rand(0, 0.003));
+        res.lat += window.DP.Helpers.rand(-0.002, 0.002);
+        res.lng += window.DP.Helpers.rand(-0.002, 0.002);
+        if (bounds) {
+          res.lat = window.DP.Helpers.clamp(res.lat, bounds.minLat, bounds.maxLat);
+          res.lng = window.DP.Helpers.clamp(res.lng, bounds.minLng, bounds.maxLng);
+        }
+        res.fuel = Math.max(0.05, res.fuel - window.DP.Helpers.rand(0, 0.002));
         res.lastUpdate = Date.now();
       }
     });
