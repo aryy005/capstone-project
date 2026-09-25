@@ -380,10 +380,10 @@ class Application {
 
       const theme = document.body.getAttribute('data-theme') || 'dark';
       const tileUrl = theme === 'light'
-        ? 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png'
-        : 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+        ? (window.DP.CONSTANTS.MAP.TILE_LIGHT_URL || 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png')
+        : (window.DP.CONSTANTS.MAP.TILE_URL || 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}');
 
-      L.tileLayer(tileUrl, { maxZoom: 19 }).addTo(this.dashboardMap);
+      L.tileLayer(tileUrl, { maxZoom: 18, attribution: window.DP.CONSTANTS.MAP.TILE_ATTRIBUTION }).addTo(this.dashboardMap);
       this.dashMarkersLayer = L.layerGroup().addTo(this.dashboardMap);
     } else if (this.dashboardMap) {
       this.dashboardMap.invalidateSize();
@@ -428,8 +428,10 @@ class Application {
         touchZoom: false
       });
 
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-        maxZoom: 18
+      const heroTileUrl = window.DP.CONSTANTS.MAP.TILE_URL || 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}';
+      L.tileLayer(heroTileUrl, {
+        maxZoom: 18,
+        attribution: window.DP.CONSTANTS.MAP.TILE_ATTRIBUTION
       }).addTo(this.landingHeroMap);
 
       // Concentric Radar Rings around key disaster centers

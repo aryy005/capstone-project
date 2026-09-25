@@ -51,7 +51,7 @@ window.DP.MapManager = class {
 
     const theme = document.body.getAttribute('data-theme') || 'dark';
     const tileUrl = theme === 'light'
-      ? 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png'
+      ? (window.DP.CONSTANTS.MAP.TILE_LIGHT_URL || 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png')
       : window.DP.CONSTANTS.MAP.TILE_URL;
 
     this.tileLayer = L.tileLayer(tileUrl, {
@@ -99,7 +99,7 @@ window.DP.MapManager = class {
       this.map.removeLayer(this.tileLayer);
     }
     const tileUrl = theme === 'light'
-      ? 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png'
+      ? (window.DP.CONSTANTS.MAP.TILE_LIGHT_URL || 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png')
       : window.DP.CONSTANTS.MAP.TILE_URL;
 
     this.tileLayer = L.tileLayer(tileUrl, {
@@ -149,13 +149,13 @@ window.DP.MapManager = class {
             creditContainer: document.createElement('div')
           });
 
-          // Add free open CartoDB tile layer (no API key needed)
+          // Add free open Esri Dark Canvas layer (no API key needed)
           const theme = document.body.getAttribute('data-theme') || 'dark';
-          const tilePath = theme === 'light' ? 'rastertiles/voyager' : 'dark_all';
           const imageryProvider = new window.Cesium.UrlTemplateImageryProvider({
-            url: `https://{s}.basemaps.cartocdn.com/${tilePath}/{z}/{x}/{y}.png`,
-            subdomains: ['a', 'b', 'c', 'd'],
-            maximumLevel: 18
+            url: theme === 'light'
+              ? 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
+              : 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
+            maximumLevel: 16
           });
           this.cesiumViewer.imageryLayers.addImageryProvider(imageryProvider);
         } catch (err) {

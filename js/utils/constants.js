@@ -41,8 +41,9 @@ window.DP.CONSTANTS = {
   MAP: {
     DEFAULT_CENTER: [20.5937, 78.9629],
     DEFAULT_ZOOM: 5,
-    TILE_URL: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
-    TILE_ATTRIBUTION: '&copy; <a href="https://carto.com/">CARTO</a>',
+    TILE_URL: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
+    TILE_LIGHT_URL: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    TILE_ATTRIBUTION: 'Tiles &copy; Esri, DeLorme, NAVTEQ | &copy; OpenStreetMap',
     MAX_ZOOM: 18
   },
 
