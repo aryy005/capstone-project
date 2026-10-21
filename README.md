@@ -58,8 +58,9 @@ Open **`http://localhost:8080`** in your web browser!
 
 ---
 
-## 🎓 Phase 2 Roadmap
-1. **YOLOv8 Aerial Computer Vision**: Automated survivor and damage detection from drone feeds.
-2. **Whisper Speech-to-Text**: Multilingual regional Indian emergency call processing.
-3. **NDMA / NDRF Live API Sync**: Direct server-to-server alert integration.
-4. **Offline Mesh Networking**: Peer-to-peer responder communication in zero-cell-coverage zones.
+## 🎓 Phase 2 Upgrades (Delivered & Operational)
+1. **🛸 YOLOv8 Aerial Computer Vision Simulator**: Real-time bounding-box survivor, structural breach, and submerged road detection across FLIR Thermal IR, Optical RGB, and Night Vision modes with 1-click GPS geotagging to the tactical map.
+2. **🎙️ Emergency 112 Voice Call Analyzer (Whisper AI)**: Ingestion terminal for regional distress calls with animated audio waveforms, real-time speech-to-text transcription, automated NLP entity extraction, and instant Decision Tree dispatch.
+3. **📄 Executive Situation Report (SITREP) Engine**: One-click generation of official NDMA-compliant operational situation reports with `@media print` formatting for immediate ministerial / NDRF briefings.
+4. **🚨 Live Citizen SOS / Dynamic Incident Injector**: Real-time distress call injection allowing operators to test and demonstrate live Decision Tree triage, A* avoidance re-routing, and neural damage updates in front of evaluators.
+5. **🛡️ Geospatial Land-Bounding & Zero-API Mapping**: Strict coastal bounding box enforcement preventing maritime spillage, powered by free open Esri Dark Canvas and CesiumJS 3D WebGL terrain with zero API keys required.
