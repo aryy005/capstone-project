@@ -89,15 +89,30 @@ window.DP.DataSimulator = class {
       const data = await res.json();
       const current = data.current;
       if (current) {
-        this.weatherData = {
-          windSpeed:        window.DP.Helpers.clamp((current.wind_speed_10m || 20) / 100, 0.1, 1),
-          rainfall:         window.DP.Helpers.clamp((current.rain || 10) / 100, 0.1, 1),
-          seismicActivity:  this.weatherData.seismicActivity || 0.1,
-          temperature:      window.DP.Helpers.clamp((current.temperature_2m || 25) / 50, 0.1, 1),
-          humidity:         window.DP.Helpers.clamp((current.relative_humidity_2m || 70) / 100, 0.1, 1),
-          incidentReports:  this.weatherData.incidentReports || 0.5,
-          isLiveAPI: true
-        };
+        const p = this.activeScenario?.weatherParams;
+        if (p) {
+          // Preserve scenario disaster telemetry (do not wipe out hurricane winds, earthquake seismic, etc.)
+          // while enriching with real ambient temperature/humidity variance
+          this.weatherData = {
+            windSpeed:        p.windSpeed !== undefined ? p.windSpeed : window.DP.Helpers.clamp((current.wind_speed_10m || 20) / 100, 0.1, 1),
+            rainfall:         p.rainfall !== undefined ? p.rainfall : window.DP.Helpers.clamp((current.rain || 10) / 100, 0.1, 1),
+            seismicActivity:  p.seismicActivity !== undefined ? p.seismicActivity : 0.05,
+            temperature:      p.temperature !== undefined ? p.temperature : window.DP.Helpers.clamp((current.temperature_2m || 25) / 50, 0.1, 1),
+            humidity:         p.humidity !== undefined ? p.humidity : window.DP.Helpers.clamp((current.relative_humidity_2m || 70) / 100, 0.1, 1),
+            incidentReports:  p.incidentReports !== undefined ? p.incidentReports : 0.85,
+            isLiveAPI: true
+          };
+        } else {
+          this.weatherData = {
+            windSpeed:        window.DP.Helpers.clamp((current.wind_speed_10m || 20) / 100, 0.1, 1),
+            rainfall:         window.DP.Helpers.clamp((current.rain || 10) / 100, 0.1, 1),
+            seismicActivity:  this.weatherData.seismicActivity || 0.1,
+            temperature:      window.DP.Helpers.clamp((current.temperature_2m || 25) / 50, 0.1, 1),
+            humidity:         window.DP.Helpers.clamp((current.relative_humidity_2m || 70) / 100, 0.1, 1),
+            incidentReports:  this.weatherData.incidentReports || 0.5,
+            isLiveAPI: true
+          };
+        }
         this.emit('weatherUpdated', this.weatherData);
       }
     } catch (e) {
@@ -254,16 +269,22 @@ window.DP.DataSimulator = class {
   }
 
   _updateWeather() {
-    const fluctuate = (val, noise = 0.03) =>
-      window.DP.Helpers.clamp(val + window.DP.Helpers.rand(-noise, noise), 0, 1);
+    const p = this.activeScenario?.weatherParams;
+    const fluctuate = (baseVal, currentVal, noise = 0.015) => {
+      const target = baseVal !== undefined ? baseVal : currentVal;
+      // Mean-reverting random walk towards scenario disaster baseline
+      const drift = (target - currentVal) * 0.15;
+      return window.DP.Helpers.clamp(currentVal + drift + window.DP.Helpers.rand(-noise, noise), 0.01, 0.99);
+    };
 
     this.weatherData = {
-      windSpeed:        fluctuate(this.weatherData.windSpeed || 0.5, 0.04),
-      rainfall:         fluctuate(this.weatherData.rainfall  || 0.3, 0.03),
-      seismicActivity:  fluctuate(this.weatherData.seismicActivity || 0.1, 0.02),
-      temperature:      fluctuate(this.weatherData.temperature || 0.5, 0.02),
-      humidity:         fluctuate(this.weatherData.humidity || 0.5, 0.03),
-      incidentReports:  fluctuate(this.weatherData.incidentReports || 0.4, 0.05)
+      windSpeed:        fluctuate(p?.windSpeed, this.weatherData.windSpeed || 0.5, 0.015),
+      rainfall:         fluctuate(p?.rainfall, this.weatherData.rainfall || 0.3, 0.015),
+      seismicActivity:  fluctuate(p?.seismicActivity, this.weatherData.seismicActivity || 0.05, 0.01),
+      temperature:      fluctuate(p?.temperature, this.weatherData.temperature || 0.5, 0.015),
+      humidity:         fluctuate(p?.humidity, this.weatherData.humidity || 0.5, 0.015),
+      incidentReports:  fluctuate(p?.incidentReports, this.weatherData.incidentReports || 0.7, 0.015),
+      isLiveAPI:        this.weatherData.isLiveAPI
     };
     return this.weatherData;
   }

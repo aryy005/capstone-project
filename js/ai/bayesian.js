@@ -7,73 +7,74 @@ window.DP = window.DP || {};
  */
 window.DP.BayesianThreatNetwork = class {
   constructor() {
-    // Prior probabilities for each disaster type
-    this.priors = {
+    // Default baseline prior probabilities across disaster categories
+    this.defaultPriors = {
       hurricane:  0.08,
       earthquake: 0.06,
       wildfire:   0.10,
       flood:      0.15,
-      chemical:   0.04,
+      chemical:   0.08,
       tsunami:    0.03,
-      tornado:    0.07
+      tornado:    0.06
     };
+    this.priors = { ...this.defaultPriors };
 
     // Likelihood tables: P(evidence_level | disaster_type)
-    // Each entry: [P(low), P(moderate), P(high), P(extreme)]
+    // Discretized levels: [0: low (<0.25), 1: moderate (0.25-0.50), 2: high (0.50-0.75), 3: extreme (>=0.75)]
     this.likelihoods = {
       windSpeed: {
-        hurricane:  [0.01, 0.05, 0.25, 0.69],
-        earthquake: [0.60, 0.25, 0.10, 0.05],
-        wildfire:   [0.10, 0.30, 0.40, 0.20],
-        flood:      [0.20, 0.35, 0.30, 0.15],
-        chemical:   [0.50, 0.30, 0.15, 0.05],
-        tsunami:    [0.40, 0.30, 0.20, 0.10],
-        tornado:    [0.02, 0.08, 0.30, 0.60]
+        hurricane:  [0.001, 0.010, 0.150, 0.839],
+        earthquake: [0.750, 0.200, 0.045, 0.005],
+        wildfire:   [0.050, 0.200, 0.600, 0.150],
+        flood:      [0.350, 0.450, 0.180, 0.020],
+        chemical:   [0.250, 0.600, 0.140, 0.010],
+        tsunami:    [0.400, 0.350, 0.200, 0.050],
+        tornado:    [0.001, 0.020, 0.200, 0.779]
       },
       rainfall: {
-        hurricane:  [0.02, 0.08, 0.25, 0.65],
-        earthquake: [0.50, 0.30, 0.15, 0.05],
-        wildfire:   [0.60, 0.30, 0.08, 0.02],
-        flood:      [0.05, 0.10, 0.30, 0.55],
-        chemical:   [0.40, 0.35, 0.20, 0.05],
-        tsunami:    [0.45, 0.30, 0.15, 0.10],
-        tornado:    [0.15, 0.30, 0.35, 0.20]
+        hurricane:  [0.001, 0.020, 0.200, 0.779],
+        earthquake: [0.700, 0.220, 0.070, 0.010],
+        wildfire:   [0.850, 0.130, 0.019, 0.001],
+        flood:      [0.001, 0.020, 0.250, 0.729],
+        chemical:   [0.700, 0.250, 0.040, 0.010],
+        tsunami:    [0.450, 0.350, 0.150, 0.050],
+        tornado:    [0.100, 0.300, 0.450, 0.150]
       },
       seismicActivity: {
-        hurricane:  [0.70, 0.20, 0.08, 0.02],
-        earthquake: [0.02, 0.08, 0.30, 0.60],
-        wildfire:   [0.75, 0.18, 0.05, 0.02],
-        flood:      [0.65, 0.22, 0.10, 0.03],
-        chemical:   [0.70, 0.20, 0.07, 0.03],
-        tsunami:    [0.05, 0.15, 0.35, 0.45],
-        tornado:    [0.70, 0.20, 0.08, 0.02]
+        hurricane:  [0.900, 0.080, 0.019, 0.001],
+        earthquake: [0.001, 0.010, 0.080, 0.909],
+        wildfire:   [0.920, 0.070, 0.009, 0.001],
+        flood:      [0.900, 0.080, 0.019, 0.001],
+        chemical:   [0.950, 0.040, 0.009, 0.001],
+        tsunami:    [0.050, 0.150, 0.400, 0.400],
+        tornado:    [0.900, 0.080, 0.019, 0.001]
       },
       temperature: {
-        hurricane:  [0.10, 0.20, 0.40, 0.30],
-        earthquake: [0.25, 0.35, 0.25, 0.15],
-        wildfire:   [0.02, 0.08, 0.30, 0.60],
-        flood:      [0.20, 0.35, 0.30, 0.15],
-        chemical:   [0.25, 0.30, 0.25, 0.20],
-        tsunami:    [0.25, 0.35, 0.25, 0.15],
-        tornado:    [0.05, 0.15, 0.40, 0.40]
+        hurricane:  [0.100, 0.300, 0.500, 0.100],
+        earthquake: [0.300, 0.400, 0.250, 0.050],
+        wildfire:   [0.001, 0.020, 0.200, 0.779],
+        flood:      [0.250, 0.450, 0.250, 0.050],
+        chemical:   [0.150, 0.450, 0.350, 0.050],
+        tsunami:    [0.300, 0.400, 0.250, 0.050],
+        tornado:    [0.050, 0.250, 0.450, 0.250]
       },
       humidity: {
-        hurricane:  [0.03, 0.07, 0.25, 0.65],
-        earthquake: [0.25, 0.35, 0.25, 0.15],
-        wildfire:   [0.55, 0.30, 0.12, 0.03],
-        flood:      [0.05, 0.15, 0.30, 0.50],
-        chemical:   [0.30, 0.35, 0.25, 0.10],
-        tsunami:    [0.20, 0.30, 0.30, 0.20],
-        tornado:    [0.10, 0.20, 0.40, 0.30]
+        hurricane:  [0.001, 0.010, 0.150, 0.839],
+        earthquake: [0.350, 0.350, 0.250, 0.050],
+        wildfire:   [0.850, 0.130, 0.019, 0.001],
+        flood:      [0.001, 0.010, 0.180, 0.809],
+        chemical:   [0.150, 0.650, 0.180, 0.020],
+        tsunami:    [0.150, 0.350, 0.350, 0.150],
+        tornado:    [0.100, 0.300, 0.400, 0.200]
       },
       incidentReports: {
-        hurricane:  [0.05, 0.10, 0.30, 0.55],
-        earthquake: [0.05, 0.10, 0.25, 0.60],
-        wildfire:   [0.05, 0.10, 0.30, 0.55],
-        flood:      [0.05, 0.10, 0.30, 0.55],
-        chemical:   [0.10, 0.20, 0.35, 0.35],
-        tsunami:    [0.05, 0.10, 0.25, 0.60],
-        tornado:    [0.05, 0.10, 0.30, 0.55]
+        hurricane:  [0.010, 0.050, 0.250, 0.690],
+        earthquake: [0.010, 0.050, 0.250, 0.690],
+        wildfire:   [0.010, 0.050, 0.250, 0.690],
+        flood:      [0.010, 0.050, 0.250, 0.690],
+        chemical:   [0.010, 0.050, 0.250, 0.690],
+        tsunami:    [0.010, 0.050, 0.250, 0.690],
+        tornado:    [0.010, 0.050, 0.250, 0.690]
       }
     };
 
@@ -90,11 +91,26 @@ window.DP.BayesianThreatNetwork = class {
     return 3;
   }
 
-  // Run inference given current evidence
-  infer(evidence) {
-    const disasterTypes = Object.keys(this.priors);
+  // Run Bayesian inference given current evidence telemetry and optional active emergency context
+  infer(evidence, activeDisasterType = null) {
+    const disasterTypes = Object.keys(this.defaultPriors);
     const unnormalized = {};
     let total = 0;
+
+    // Dynamically adjust operational prior when a declared emergency context exists
+    const activePriors = {};
+    if (activeDisasterType && this.defaultPriors[activeDisasterType.toLowerCase()]) {
+      const activeKey = activeDisasterType.toLowerCase();
+      const remainingWeight = 0.18;
+      const otherTypes = disasterTypes.filter(d => d !== activeKey);
+      activePriors[activeKey] = 0.82;
+      otherTypes.forEach(d => {
+        activePriors[d] = remainingWeight / otherTypes.length;
+      });
+    } else {
+      Object.assign(activePriors, this.defaultPriors);
+    }
+    this.priors = activePriors;
 
     disasterTypes.forEach(disaster => {
       let prob = this.priors[disaster];
@@ -116,7 +132,7 @@ window.DP.BayesianThreatNetwork = class {
       this.posteriors[disaster] = total > 0 ? unnormalized[disaster] / total : this.priors[disaster];
     });
 
-    // Calculate overall threat level (0-1)
+    // Calculate overall threat level (0-1) reflecting primary hazard severity
     this.overallThreatLevel = this._calculateOverallThreat(evidence);
 
     // Store in history
@@ -131,16 +147,18 @@ window.DP.BayesianThreatNetwork = class {
   }
 
   _calculateOverallThreat(evidence) {
-    const weights = { windSpeed: 0.20, rainfall: 0.18, seismicActivity: 0.22, temperature: 0.12, humidity: 0.13, incidentReports: 0.15 };
-    let threat = 0;
-    let totalWeight = 0;
-    Object.keys(weights).forEach(key => {
-      if (evidence[key] !== undefined) {
-        threat += evidence[key] * weights[key];
-        totalWeight += weights[key];
-      }
-    });
-    return totalWeight > 0 ? window.DP.Helpers.clamp(threat / totalWeight, 0, 1) : 0;
+    const topThreat = this.getTopThreat();
+    const topProb = topThreat ? topThreat.probability : 0.5;
+    const maxVal = Math.max(
+      evidence.windSpeed || 0,
+      evidence.rainfall || 0,
+      evidence.seismicActivity || 0,
+      evidence.temperature || 0,
+      evidence.incidentReports || 0
+    );
+    // Overall threat is weighted combination of Bayesian posterior confidence and peak hazard telemetry
+    const threat = Math.min(0.998, Math.max(0.08, (topProb * 0.70) + (maxVal * 0.30)));
+    return window.DP.Helpers ? window.DP.Helpers.clamp(threat, 0, 1) : threat;
   }
 
   getTopThreat() {

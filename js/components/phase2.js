@@ -432,9 +432,9 @@ window.DP.Phase2 = {
   generateSitrepModal() {
     this.closeModal();
 
-    const scen = window.DP.App?.selectedScenario || { name: 'Cyclone Michaung Landfall', affectedPopulation: 2400000 };
+    const scen = window.DP.App?.selectedScenario || { name: 'Cyclone Michaung Landfall', affectedPopulation: 2400000, disasterType: 'hurricane' };
     const stats = window.DP.App?.simulator?.getStats() || { active: 5, deployed: 18, standby: 140, totalPop: 465000 };
-    const topThreat = window.DP.App?.ai?.bayesian?.getTopThreat() || { type: 'hurricane', probability: 0.942 };
+    const topThreat = window.DP.App?.ai?.bayesian?.getTopThreat() || { type: scen.disasterType || 'hurricane', probability: 0.994 };
     const nnPred = window.DP.App?.ai?.neuralNet?.lastPrediction || { estimatedCasualties: 55, monetaryLossM: 14.5 };
     const routesCount = window.DP.App?.ai?.astar?.routes?.length || 3;
     const nowStr = new Date().toLocaleString('en-US', { dateStyle: 'full', timeStyle: 'medium' });
@@ -505,7 +505,7 @@ window.DP.Phase2 = {
                   <tr>
                     <td><strong>Threat Network</strong></td>
                     <td>Recursive Bayesian Updating</td>
-                    <td>${(topThreat.probability * 100).toFixed(1)}% ${topThreat.type.toUpperCase()}</td>
+                    <td>${(topThreat.probability * 100).toFixed(1)}% ${(topThreat.type || scen.disasterType || 'hurricane').toUpperCase()}</td>
                     <td>Elevate State Emergency Operations to Level 5.</td>
                   </tr>
                   <tr>

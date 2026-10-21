@@ -140,7 +140,8 @@ class Application {
 
   runAIEngine() {
     // 1. Bayesian Threat Inference
-    this.ai.bayesian.infer(this.simulator.weatherData);
+    const activeDisaster = this.selectedScenario?.disasterType || null;
+    this.ai.bayesian.infer(this.simulator.weatherData, activeDisaster);
 
     // 2. K-Means Clustering on active incident spatial points
     const activePoints = this.simulator.incidents.map(i => ({
