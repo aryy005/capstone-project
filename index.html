@@ -574,8 +574,16 @@
                   <div class="dash-map-title">LIVE SITUATION MAP</div>
                   <div class="dash-map-subtitle">Real-time overview of all incidents</div>
                 </div>
-                <div style="display: flex; gap: 8px;">
-                  <button class="btn btn-sm" onclick="window.DP.App.switchView('map')">All Incidents ▾</button>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                  <select id="dash-map-scope" class="btn btn-sm" style="background: rgba(15,23,42,0.95); border: 1px solid rgba(56,189,248,0.4); color: #38bdf8; font-weight: 700; cursor: pointer; padding: 4px 10px; border-radius: 6px;" onchange="window.DP.App.setMapScope(this.value)">
+                    <option value="all" selected>🌐 All Incidents (5 Disaster Places)</option>
+                    <option value="HURRICANE">🌀 Chennai Coast (Hurricane)</option>
+                    <option value="EARTHQUAKE">🌋 Uttarakhand Fault (Earthquake)</option>
+                    <option value="WILDFIRE">🔥 Western Ghats (Wildfire)</option>
+                    <option value="FLOOD">🌊 Assam Valley (Flash Flood)</option>
+                    <option value="CHEMICAL">☣️ Jamnagar Refinery (Chemical)</option>
+                  </select>
+                  <button class="btn btn-sm" onclick="window.DP.App.switchView('map')">Full Map 🗺️</button>
                   <button class="btn btn-sm" onclick="window.DP.App.ui.map.toggle3DMode()">3D View 🌐</button>
                 </div>
               </div>
@@ -733,6 +741,14 @@
 
           <div class="map-controls">
             <div class="map-control-group">
+              <select id="live-map-scope" class="map-ctrl-btn" style="background: rgba(15,23,42,0.95); border: 1px solid #38bdf8; color: #38bdf8; font-weight: 700; cursor: pointer; padding: 6px 12px; border-radius: 6px;" onchange="window.DP.App.setMapScope(this.value)">
+                <option value="all" selected>🌐 All Incidents (Pan-India — 5 Zones)</option>
+                <option value="HURRICANE">🌀 Chennai Coast (Hurricane)</option>
+                <option value="EARTHQUAKE">🌋 Uttarakhand Fault (Earthquake)</option>
+                <option value="WILDFIRE">🔥 Western Ghats (Wildfire)</option>
+                <option value="FLOOD">🌊 Assam Valley (Flash Flood)</option>
+                <option value="CHEMICAL">☣️ Jamnagar Refinery (Chemical)</option>
+              </select>
               <button class="map-ctrl-btn active" id="btn-toggle-3d" onclick="window.DP.App.ui.map.toggle3DMode()" style="background: linear-gradient(135deg, #818cf8, #38bdf8); color: #070a14; font-weight: 700;">
                 <span class="map-ctrl-icon">🌐</span> Switch to 3D Globe Mode
               </button>

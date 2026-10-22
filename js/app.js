@@ -26,6 +26,7 @@ class Application {
     this.compareManager = new window.DP.CompareManager();
     this.currentView      = 'landing';
     this.selectedScenario = window.DP.Scenarios.HURRICANE;
+    this.mapScope         = 'all';
   }
 
   init() {
@@ -386,15 +387,66 @@ class Application {
     this.updateUI();
   }
 
+  getAllIncidentsAcrossAllScenarios() {
+    const list = [];
+    if (window.DP.Scenarios) {
+      Object.entries(window.DP.Scenarios).forEach(([key, scen]) => {
+        (scen.incidents || []).forEach(inc => {
+          list.push({
+            ...inc,
+            scenarioKey: key,
+            scenarioName: scen.name,
+            disasterType: scen.disasterType,
+            scenarioCenter: scen.center,
+            icon: scen.icon || '⚠️',
+            color: scen.color || '#ff1744'
+          });
+        });
+      });
+    }
+    return list;
+  }
+
+  setMapScope(scope) {
+    this.mapScope = scope;
+    const dashSelect = document.getElementById('dash-map-scope');
+    const liveSelect = document.getElementById('live-map-scope');
+    if (dashSelect) dashSelect.value = scope;
+    if (liveSelect) liveSelect.value = scope;
+
+    if (scope === 'all') {
+      if (this.currentView === 'dashboard') {
+        this.ensureDashboardMap();
+      } else if (this.currentView === 'map' && this.ui.map) {
+        const allIncidents = this.getAllIncidentsAcrossAllScenarios();
+        this.ui.map.renderAllDisasterZones(allIncidents);
+      }
+    } else if (window.DP.Scenarios && window.DP.Scenarios[scope]) {
+      this.loadScenario(scope);
+      if (this.currentView === 'dashboard') {
+        this.ensureDashboardMap();
+      } else if (this.currentView === 'map' && this.ui.map) {
+        this.ui.map.render({
+          incidents: this.simulator.incidents,
+          resources: this.simulator.resources,
+          scenario: this.selectedScenario,
+          ai: this.ai
+        });
+        if (this.ui.map.map && this.selectedScenario.center) {
+          this.ui.map.setCenter(this.selectedScenario.center, 10);
+        }
+      }
+    }
+  }
+
   ensureDashboardMap() {
     const container = document.getElementById('dashboard-map');
     if (!container) return;
 
     if (!this.dashboardMap && window.L) {
-      const center = this.selectedScenario?.center || [13.0827, 80.2707];
       this.dashboardMap = L.map('dashboard-map', {
-        center: center,
-        zoom: 10,
+        center: [22.0, 79.5],
+        zoom: 4.5,
         zoomControl: false,
         attributionControl: false
       });
@@ -408,13 +460,61 @@ class Application {
       this.dashMarkersLayer = L.layerGroup().addTo(this.dashboardMap);
     } else if (this.dashboardMap) {
       this.dashboardMap.invalidateSize();
+    }
+
+    if (!this.dashboardMap || !this.dashMarkersLayer) return;
+
+    this.dashMarkersLayer.clearLayers();
+
+    if (this.mapScope === 'all') {
+      this.dashboardMap.setView([22.0, 79.5], 4.5);
+      const allIncidents = this.getAllIncidentsAcrossAllScenarios();
+
+      // 1. Render all 21 incidents across the 5 disaster regions
+      allIncidents.forEach(inc => {
+        const color = inc.severity >= 5 ? '#ff1744' : (inc.severity >= 4 ? '#ff6d00' : (inc.severity >= 3 ? '#ffd600' : '#00e676'));
+        const marker = L.circleMarker([inc.lat, inc.lng], {
+          radius: 7,
+          fillColor: color,
+          color: '#ffffff',
+          weight: 1.5,
+          opacity: 1,
+          fillOpacity: 0.95
+        });
+        const regName = inc.scenarioName ? inc.scenarioName.split('—')[0].trim() : '';
+        marker.bindTooltip(`<strong>${inc.icon} ${inc.title}</strong><br>Severity Level ${inc.severity} (${regName})`);
+        marker.on('click', () => {
+          this.setMapScope(inc.scenarioKey);
+        });
+        marker.addTo(this.dashMarkersLayer);
+      });
+
+      // 2. Render 5 pulsing Region Zone Hub Badges
+      if (window.DP.Scenarios) {
+        Object.entries(window.DP.Scenarios).forEach(([key, scen]) => {
+          const hubIcon = L.divIcon({
+            className: 'dash-region-badge',
+            html: `
+              <div style="background: rgba(15, 23, 42, 0.92); border: 2px solid ${scen.color}; border-radius: 16px; padding: 3px 8px; color: #fff; font-size: 10px; font-weight: 800; white-space: nowrap; box-shadow: 0 0 12px ${scen.color}aa; cursor: pointer; display: flex; align-items: center; gap: 4px;">
+                <span>${scen.icon}</span>
+                <span>${scen.name.split('—')[0].trim()}</span>
+              </div>
+            `,
+            iconSize: [110, 22],
+            iconAnchor: [55, 11]
+          });
+
+          const hub = L.marker(scen.center, { icon: hubIcon }).addTo(this.dashMarkersLayer);
+          hub.on('click', () => {
+            this.setMapScope(key);
+          });
+        });
+      }
+    } else {
+      // Focus on selected scenario center
       if (this.selectedScenario?.center) {
         this.dashboardMap.setView(this.selectedScenario.center, 10);
       }
-    }
-
-    if (this.dashboardMap && this.dashMarkersLayer) {
-      this.dashMarkersLayer.clearLayers();
       const incidents = this.simulator?.incidents || [];
       incidents.forEach(inc => {
         const color = inc.severity >= 4 ? '#f43f5e' : (inc.severity >= 3 ? '#fbbf24' : '#38bdf8');

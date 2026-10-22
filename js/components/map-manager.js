@@ -212,10 +212,128 @@ window.DP.MapManager = class {
     }
   }
 
+  clearAllLayers() {
+    this.markers.forEach(m => this.map.removeLayer(m));
+    this.markers.clear();
+    this.resourceMarkers.forEach(m => this.map.removeLayer(m));
+    this.resourceMarkers.clear();
+    this.clearRoutes();
+    this.clearHazards();
+    this.clearStaging();
+    this.clearSafeZones();
+    this.clearEvacuationPoints();
+    if (this.monteCarloHeatmapLayer) {
+      this.map.removeLayer(this.monteCarloHeatmapLayer);
+      this.monteCarloHeatmapLayer = null;
+    }
+    if (this.heatmapLayer) {
+      this.map.removeLayer(this.heatmapLayer);
+      this.heatmapLayer = null;
+    }
+  }
+
+  renderAllDisasterZones(allIncidents) {
+    if (!this.map) return;
+    this.clearAllLayers();
+
+    // Pan-India extent covering all 5 disaster zones
+    this.map.fitBounds([[8.5, 68.0], [32.5, 95.0]], { padding: [40, 40] });
+
+    // 1. Render all 21 incidents across the 5 disaster regions
+    allIncidents.forEach(inc => {
+      const color = window.DP.Helpers.severityColor((inc.severity || 1) / 5);
+      const iconText = inc.icon || '⚠️';
+      const pulseClass = inc.severity >= 5 ? 'pulse-critical' : inc.severity >= 4 ? 'pulse-high' : '';
+
+      const customIcon = L.divIcon({
+        className: 'custom-marker-wrap',
+        html: `
+          <div class="custom-marker ${pulseClass}" style="background:${color}; width:30px; height:30px; color:#fff;">
+            ${iconText}
+          </div>
+        `,
+        iconSize: [30, 30],
+        iconAnchor: [15, 15]
+      });
+
+      const marker = L.marker([inc.lat, inc.lng], { icon: customIcon }).addTo(this.map);
+      const regionTitle = inc.scenarioName ? inc.scenarioName.split('—')[0].trim() : '';
+      const popupContent = `
+        <div class="incident-popup">
+          <div class="incident-popup-header">
+            <span>${iconText}</span>
+            <div class="incident-popup-title">${inc.title}</div>
+          </div>
+          <div class="badge badge-${(window.DP.CONSTANTS.THREAT_LEVELS[(inc.severity||1)-1] || 'LOW').toLowerCase()}">
+            Severity Level ${inc.severity} (${regionTitle})
+          </div>
+          <div class="incident-popup-grid">
+            <div class="incident-popup-item">
+              <div class="incident-popup-item-label">Affected</div>
+              <div class="incident-popup-item-value">👥 ${(inc.populationAffected||0).toLocaleString()}</div>
+            </div>
+            <div class="incident-popup-item">
+              <div class="incident-popup-item-label">Responders</div>
+              <div class="incident-popup-item-value">🚓 ${inc.responders||0}</div>
+            </div>
+          </div>
+          <button class="btn btn-primary btn-sm" style="width: 100%; margin-top: 8px;" onclick="window.DP.App.setMapScope('${inc.scenarioKey}')">
+            🎯 Zoom to ${regionTitle}
+          </button>
+        </div>
+      `;
+      marker.bindPopup(popupContent);
+      this.markers.set(inc.id, marker);
+    });
+
+    // 2. Render Regional Danger Zones and labels for each of the 5 disaster places
+    if (window.DP.Scenarios) {
+      Object.entries(window.DP.Scenarios).forEach(([key, scen]) => {
+        (scen.hazardZones || []).forEach(hz => {
+          const circle = L.circle([hz.lat, hz.lng], {
+            radius: (hz.radiusKm || 5) * 1000,
+            color: scen.color || '#ff1744',
+            fillColor: scen.color || '#ff1744',
+            fillOpacity: 0.20,
+            weight: 2,
+            dashArray: '5, 5'
+          }).addTo(this.map);
+          circle.bindPopup(`<strong>${hz.type}</strong><br>${scen.name}<br>Radius: ${hz.radiusKm} km`);
+          this.hazardCircles.push(circle);
+        });
+
+        // Regional Hub Beacon
+        const beaconIcon = L.divIcon({
+          className: 'zone-beacon-wrap',
+          html: `
+            <div style="background: rgba(10, 14, 23, 0.95); border: 2px solid ${scen.color}; border-radius: 20px; padding: 4px 10px; color: #fff; font-size: 11px; font-weight: 800; white-space: nowrap; box-shadow: 0 0 16px ${scen.color}aa; cursor: pointer; display: flex; align-items: center; gap: 5px;">
+              <span>${scen.icon}</span>
+              <span>${scen.name.split('—')[0].trim()} (${(scen.incidents||[]).length})</span>
+            </div>
+          `,
+          iconSize: [140, 26],
+          iconAnchor: [70, 13]
+        });
+        const beacon = L.marker(scen.center, { icon: beaconIcon }).addTo(this.map);
+        beacon.on('click', () => {
+          window.DP.App.setMapScope(key);
+        });
+        this.stagingMarkers.push(beacon);
+      });
+    }
+  }
+
   render(data) {
     if (!this.map) return;
-    const { incidents, resources, scenario, ai } = data;
     this._lastData = data; // Store data for toggling layers
+
+    if (window.DP.App && window.DP.App.mapScope === 'all') {
+      const allIncidents = window.DP.App.getAllIncidentsAcrossAllScenarios();
+      this.renderAllDisasterZones(allIncidents);
+      return;
+    }
+
+    const { incidents, resources, scenario, ai } = data;
 
     if (this.layers.incidents) this.renderIncidents(incidents);
     if (this.layers.resources) this.renderResources(resources);
