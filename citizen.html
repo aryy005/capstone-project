@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Citizen Disaster Safety & Evacuation Portal — NDMA / Sentinel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <style>
+    :root {
+      --bg: #090d16;
+      --card-bg: #111827;
+      --card-border: #1f2937;
+      --red: #ef4444;
+      --red-glow: rgba(239, 68, 68, 0.4);
+      --green: #10b981;
+      --blue: #0284c7;
+      --amber: #f59e0b;
+      --text: #f9fafb;
+      --text-muted: #94a3b8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding-bottom: 40px;
+    }
+
+    /* Top Emergency Alert Bar */
+    .emergency-bar {
+      background: #dc2626;
+      color: white;
+      padding: 10px 16px;
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 10px rgba(220, 38, 38, 0.4);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .alert-pulse-dot {
+      width: 10px;
+      height: 10px;
+      background: white;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 6px;
+      animation: alertPulse 1.2s infinite;
+    }
+
+    @keyframes alertPulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.3; transform: scale(0.8); }
+    }
+
+    /* Nav Header */
+    .portal-nav {
+      background: #0f172a;
+      border-bottom: 1px solid var(--card-border);
+      padding: 14px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .portal-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .portal-logo-icon {
+      font-size: 26px;
+    }
+
+    .portal-heading {
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+    }
+
+    .portal-subheading {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .portal-role-links {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-nav-link {
+      background: rgba(255, 255, 255, 0.08);
+      color: #cbd5e1;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      text-decoration: none;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.2s;
+    }
+
+    .btn-nav-link:hover {
+      background: rgba(255, 255, 255, 0.18);
+      color: #fff;
+    }
+
+    /* Container */
+    .portal-container {
+      max-width: 900px;
+      margin: 20px auto;
+      padding: 0 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      width: 100%;
+    }
+
+    /* SOS Button Hero Card */
+    .sos-card {
+      background: radial-gradient(circle at center, #1e1b4b 0%, #0f172a 100%);
+      border: 2px solid #ef4444;
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+      position: relative;
+      box-shadow: 0 8px 30px rgba(239, 68, 68, 0.2);
+    }
+
+    .sos-badge {
+      display: inline-block;
+      background: rgba(239, 68, 68, 0.2);
+      border: 1px solid #ef4444;
+      color: #fca5a5;
+      font-size: 12px;
+      font-weight: 800;
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-bottom: 14px;
+      letter-spacing: 0.5px;
+    }
+
+    .sos-btn-wrapper {
+      margin: 16px 0;
+      display: flex;
+      justify-content: center;
+    }
+
+    .sos-big-btn {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+      border: 6px solid #fecaca;
+      color: white;
+      font-size: 26px;
+      font-weight: 900;
+      letter-spacing: 1.5px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 0 40px var(--red-glow), 0 0 10px var(--red);
+      animation: pulseBtn 2s infinite;
+      transition: transform 0.15s;
+    }
+
+    .sos-big-btn:hover {
+      transform: scale(1.04);
+    }
+
+    .sos-big-btn:active {
+      transform: scale(0.96);
+    }
+
+    @keyframes pulseBtn {
+      0%, 100% { box-shadow: 0 0 30px var(--red-glow); }
+      50% { box-shadow: 0 0 55px rgba(239, 68, 68, 0.7); }
+    }
+
+    .sos-subtext {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    /* Modal SOS Dialog */
+    .sos-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(5px);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .sos-modal-content {
+      background: #1e293b;
+      border: 2px solid var(--red);
+      border-radius: 12px;
+      max-width: 500px;
+      width: 100%;
+      padding: 24px;
+      color: white;
+    }
+
+    .form-group {
+      margin-bottom: 14px;
+      text-align: left;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: #cbd5e1;
+    }
+
+    .form-group input, .form-group select {
+      width: 100%;
+      background: #0f172a;
+      border: 1px solid #334155;
+      padding: 10px 12px;
+      border-radius: 6px;
+      color: white;
+      font-size: 14px;
+    }
+
+    .btn-send-sos {
+      width: 100%;
+      background: #ef4444;
+      color: white;
+      font-weight: 800;
+      font-size: 16px;
+      padding: 14px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    .btn-send-sos:hover { background: #dc2626; }
+
+    /* Map Card */
+    .portal-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .card-header-flex {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .card-heading {
+      font-size: 16px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    #evac-map {
+      height: 320px;
+      width: 100%;
+      border-radius: 8px;
+      border: 1px solid var(--card-border);
+    }
+
+    .evac-step-box {
+      background: rgba(16, 185, 129, 0.1);
+      border-left: 4px solid var(--green);
+      padding: 12px;
+      border-radius: 4px;
+      margin-top: 12px;
+      font-size: 13px;
+    }
+
+    /* Shelters List */
+    .shelter-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .shelter-card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 14px;
+    }
+
+    .shelter-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .shelter-dist {
+      font-size: 11px;
+      color: var(--green);
+      font-weight: 700;
+      margin-top: 2px;
+    }
+
+    .shelter-amenities {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
+      font-size: 11px;
+    }
+
+    .amenity-tag {
+      background: rgba(255,255,255,0.06);
+      padding: 3px 8px;
+      border-radius: 4px;
+      color: #94a3b8;
+    }
+
+    /* Helplines Strip */
+    .helpline-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    @media (max-width: 650px) {
+      .helpline-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    .helpline-box {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 12px;
+      text-align: center;
+      text-decoration: none;
+      color: white;
+      transition: all 0.2s;
+    }
+
+    .helpline-box:hover {
+      background: #334155;
+      border-color: var(--blue);
+    }
+
+    .helpline-num {
+      font-size: 20px;
+      font-weight: 800;
+      color: #38bdf8;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .helpline-desc {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* Safe Check In */
+    .safe-checkin-wrap {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .btn-safe {
+      background: var(--green);
+      color: #000;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 6px;
+      font-weight: 800;
+      font-size: 13px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .btn-safe:hover { background: #059669; }
+
+    /* Toast */
+    #citizen-toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #10b981;
+      color: #000;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      display: none;
+      z-index: 9999;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.6);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Emergency Red Alert Bar -->
+  <div class="emergency-bar">
+    <div>
+      <span class="alert-pulse-dot"></span>
+      <span>NATIONAL EMERGENCY ALERT: Category 4 Cyclone Approaching Southeast Coast</span>
+    </div>
+    <span style="font-size: 11px; background: rgba(0,0,0,0.3); padding: 2px 8px; border-radius: 4px;">NDMA LEVEL 5</span>
+  </div>
+
+  <!-- Portal Header -->
+  <header class="portal-nav">
+    <div class="portal-title">
+      <span class="portal-logo-icon">🛡️</span>
+      <div>
+        <div class="portal-heading">CITIZEN DISASTER SAFETY &amp; EVACUATION PORTAL</div>
+        <div class="portal-subheading">National Disaster Management Authority (NDMA) // Public Gateway</div>
+      </div>
+    </div>
+    <div class="portal-role-links">
+      <a href="index.html" class="btn-nav-link">🖥️ Command Center</a>
+      <a href="ndrf.html" class="btn-nav-link">🚒 NDRF Field Terminal</a>
+    </div>
+  </header>
+
+  <main class="portal-container">
+
+    <!-- Emergency SOS Hero Box -->
+    <div class="sos-card">
+      <div class="sos-badge">⚡ INSTANT EMERGENCY DISPATCH</div>
+      <h2 style="font-size: 22px; font-weight: 800;">Are you trapped or in immediate danger?</h2>
+      <p style="color: var(--text-muted); font-size: 13px; max-width: 500px; margin: 8px auto 0;">
+        Pressing SOS transmits your real-time GPS coordinates directly to the nearest NDRF rescue battalion and Army Command Center.
+      </p>
+
+      <div class="sos-btn-wrapper">
+        <button class="sos-big-btn" onclick="openSOSModal()">
+          <span>🚨</span>
+          <span>SOS</span>
+        </button>
+      </div>
+
+      <div class="sos-subtext">Zero phone balance or network data required. Works via Emergency Cell Broadcast.</div>
+    </div>
+
+    <!-- Evacuation Route Map -->
+    <div class="portal-card">
+      <div class="card-header-flex">
+        <div class="card-heading">
+          <span>🚶‍♂️</span>
+          <span>My Evacuation Walking Route &amp; Safe Zone</span>
+        </div>
+        <span style="font-size: 12px; color: var(--green); font-weight: 700;">Nearest Shelter: 850m</span>
+      </div>
+      <div id="evac-map"></div>
+      <div class="evac-step-box">
+        <strong>🟢 Recommended Walking Path:</strong> Head North along Sardar Patel Road towards Anna University Main Relief Camp. Avoid coastal Marina Promenade (Submerged in +2.5m storm surge).
+      </div>
+    </div>
+
+    <!-- Verified Shelters & Capacity -->
+    <div class="portal-card">
+      <div class="card-heading">
+        <span>🏫</span>
+        <span>Open Government Relief Shelters Near You</span>
+      </div>
+
+      <div class="shelter-grid">
+        <div class="shelter-card">
+          <div class="shelter-name">Anna University Emergency Relief Camp</div>
+          <div class="shelter-dist">📍 850m North &nbsp;•&nbsp; 🟢 320 Beds Available</div>
+          <div class="shelter-amenities">
+            <span class="amenity-tag">💧 Clean Water</span>
+            <span class="amenity-tag">🍲 Warm Food</span>
+            <span class="amenity-tag">🩺 Medical Doctors</span>
+            <span class="amenity-tag">⚡ Power Backup</span>
+          </div>
+        </div>
+
+        <div class="shelter-card">
+          <div class="shelter-name">IIT Madras Central Disaster Shelter</div>
+          <div class="shelter-dist">📍 1.8 km West &nbsp;•&nbsp; 🟢 180 Beds Available</div>
+          <div class="shelter-amenities">
+            <span class="amenity-tag">👶 Infant Food</span>
+            <span class="amenity-tag">🚑 Ambulances</span>
+            <span class="amenity-tag">🛶 Rescue Boats</span>
+          </div>
+        </div>
+
+        <div class="shelter-card">
+          <div class="shelter-name">Guindy Government High Ground Camp</div>
+          <div class="shelter-dist">📍 2.9 km South-West &nbsp;•&nbsp; 🟡 45 Beds Left</div>
+          <div class="shelter-amenities">
+            <span class="amenity-tag">💧 Bottled Water</span>
+            <span class="amenity-tag">🩺 First Aid</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- "I Am Safe" Family Status Check-in -->
+    <div class="portal-card">
+      <div class="card-heading">
+        <span>✅</span>
+        <span>"I Am Safe" Family &amp; Registry Check-In</span>
+      </div>
+      <p style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">
+        Let emergency search teams and relatives know you have safely evacuated, so rescue teams don't risk entering evacuated buildings.
+      </p>
+      <div class="safe-checkin-wrap">
+        <input type="text" id="safe-name" placeholder="Enter Full Name" style="flex: 1; background: #1e293b; border: 1px solid #334155; padding: 10px 14px; border-radius: 6px; color: white;">
+        <input type="tel" id="safe-phone" placeholder="Mobile Number" style="width: 180px; background: #1e293b; border: 1px solid #334155; padding: 10px 14px; border-radius: 6px; color: white;">
+        <button class="btn-safe" onclick="markSafe()">MARK AS SAFE</button>
+      </div>
+    </div>
+
+    <!-- Official Emergency Helplines -->
+    <div class="portal-card">
+      <div class="card-heading" style="margin-bottom: 12px;">
+        <span>📞</span>
+        <span>Official Emergency Helplines (Toll-Free)</span>
+      </div>
+      <div class="helpline-grid">
+        <a href="tel:112" class="helpline-box">
+          <div class="helpline-num">112</div>
+          <div class="helpline-desc">All-in-One Emergency</div>
+        </a>
+        <a href="tel:1070" class="helpline-box">
+          <div class="helpline-num">1070</div>
+          <div class="helpline-desc">State Emergency Ops</div>
+        </a>
+        <a href="tel:1078" class="helpline-box">
+          <div class="helpline-num">1078</div>
+          <div class="helpline-desc">NDRF Disaster Force</div>
+        </a>
+        <a href="tel:108" class="helpline-box">
+          <div class="helpline-num">108</div>
+          <div class="helpline-desc">Ambulance Service</div>
+        </a>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- SOS Detail Modal -->
+  <div class="sos-modal" id="sos-modal">
+    <div class="sos-modal-content">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h3 style="font-size: 18px; font-weight: 800; color: #ef4444;">🚨 BROADCAST EMERGENCY SOS</h3>
+        <button onclick="closeSOSModal()" style="background: none; border: none; color: #94a3b8; font-size: 20px; cursor: pointer;">✕</button>
+      </div>
+
+      <div class="form-group">
+        <label>Your Emergency Nature:</label>
+        <select id="sos-type">
+          <option value="trapped_water">🌊 Water Rising / Trapped in House</option>
+          <option value="structural_collapse">🏚️ Building Collapse / Debris</option>
+          <option value="medical_critical">🩺 Critical Medical / Oxygen Shortage</option>
+          <option value="food_water">🍲 Food / Clean Water Exhausted</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Number of People Trapped With You:</label>
+        <input type="number" id="sos-count" value="3" min="1" max="25">
+      </div>
+
+      <div class="form-group">
+        <label>Your Name / Contact Phone:</label>
+        <input type="text" id="sos-contact" placeholder="e.g. Ramesh Kumar / 9876543210">
+      </div>
+
+      <div class="form-group">
+        <label>Detected GPS Coordinates:</label>
+        <input type="text" id="sos-coords" value="12.9980° N, 80.2620° E (Besant Nagar Sector 3)" readonly style="background: #090d16; color: #38bdf8; font-family: monospace;">
+      </div>
+
+      <button class="btn-send-sos" onclick="submitSOS()">
+        TRANSMIT SOS TO RESCUE COMMAND NOW
+      </button>
+    </div>
+  </div>
+
+  <div id="citizen-toast"></div>
+
+  <script>
+    // Initialize Leaflet Map
+    const map = L.map('evac-map', { zoomControl: true }).setView([13.003, 80.245], 14);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+      maxZoom: 19,
+      attribution: '© OpenStreetMap, CartoDB'
+    }).addTo(map);
+
+    // Citizen Position (Pulsing Blue)
+    const citizenPos = [12.998, 80.255];
+    const citizenMarker = L.circleMarker(citizenPos, {
+      radius: 9,
+      fillColor: '#2563eb',
+      color: '#fff',
+      weight: 3,
+      opacity: 1,
+      fillOpacity: 1
+    }).addTo(map).bindPopup('<strong>YOU ARE HERE</strong><br>Besant Nagar Zone<br>Elev: 4m above sea level').openPopup();
+
+    // Anna University Safe Shelter (Green)
+    const shelterPos = [13.011, 80.235];
+    const shelterMarker = L.circleMarker(shelterPos, {
+      radius: 11,
+      fillColor: '#10b981',
+      color: '#064e3b',
+      weight: 3,
+      opacity: 1,
+      fillOpacity: 1
+    }).addTo(map).bindPopup('<strong>SAFE ZONE: ANNA UNIVERSITY RELIEF CAMP</strong><br>320 Beds Available<br>Food, Water & Medical Staff On Site');
+
+    // Flooded Hazard Area (Coastal)
+    L.polygon([
+      [13.030, 80.275],
+      [13.000, 80.270],
+      [12.980, 80.265],
+      [12.990, 80.280]
+    ], {
+      color: '#ef4444',
+      fillColor: '#ef4444',
+      fillOpacity: 0.35,
+      weight: 2
+    }).addTo(map).bindPopup('<strong>FLOODED SURGE ZONE</strong><br>Do not cross');
+
+    // Walking path line (Green)
+    L.polyline([
+      citizenPos,
+      [13.002, 80.248],
+      [13.008, 80.240],
+      shelterPos
+    ], {
+      color: '#10b981',
+      weight: 5,
+      dashArray: '6, 6'
+    }).addTo(map);
+
+    function openSOSModal() {
+      document.getElementById('sos-modal').style.display = 'flex';
+    }
+
+    function closeSOSModal() {
+      document.getElementById('sos-modal').style.display = 'none';
+    }
+
+    function submitSOS() {
+      const type = document.getElementById('sos-type').value;
+      const count = document.getElementById('sos-count').value;
+      const contact = document.getElementById('sos-contact').value || 'Anonymous Citizen';
+
+      // Log into localStorage so Command Center & NDRF receive it
+      const sosData = {
+        id: 'SOS-' + Date.now().toString().slice(-4),
+        type,
+        count: Number(count),
+        contact,
+        lat: 12.998,
+        lng: 80.255,
+        timestamp: Date.now()
+      };
+
+      const existing = JSON.parse(localStorage.getItem('CITIZEN_SOS_DISPATCHES') || '[]');
+      existing.unshift(sosData);
+      localStorage.setItem('CITIZEN_SOS_DISPATCHES', JSON.stringify(existing));
+
+      closeSOSModal();
+      showToast(`🚨 SOS TRANSMITTED! Ticket #${sosData.id} assigned. NDRF Battalion 04 dispatched.`);
+    }
+
+    function markSafe() {
+      const name = document.getElementById('safe-name').value;
+      if (!name) {
+        alert('Please enter your name');
+        return;
+      }
+      showToast(`✓ Thank you ${name}! You are registered as SAFE in the National Disaster Registry.`);
+      document.getElementById('safe-name').value = '';
+      document.getElementById('safe-phone').value = '';
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('citizen-toast');
+      toast.textContent = msg;
+      toast.style.display = 'block';
+      setTimeout(() => { toast.style.display = 'none'; }, 4500);
+    }
+  </script>
+</body>
+</html>

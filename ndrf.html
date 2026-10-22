@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>NDRF Tactical Field Terminal — Sentinel C4ISR</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <style>
+    :root {
+      --bg-dark: #0a0e17;
+      --bg-card: #111827;
+      --bg-card-hover: #1f2937;
+      --border: #374151;
+      --border-accent: #f59e0b;
+      --text: #f9fafb;
+      --text-muted: #9ca3af;
+      --orange: #f97316;
+      --orange-glow: rgba(249, 115, 22, 0.25);
+      --red: #ef4444;
+      --green: #10b981;
+      --blue: #3b82f6;
+      --yellow: #eab308;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* Top Tactical Bar */
+    .tactical-header {
+      background: #0f172a;
+      border-bottom: 2px solid var(--orange);
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    }
+
+    .unit-tag {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .ndrf-badge {
+      background: var(--orange);
+      color: #000;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 800;
+      font-size: 13px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      letter-spacing: 0.5px;
+    }
+
+    .unit-title {
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .unit-subtitle {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .tactical-status-strip {
+      display: flex;
+      gap: 12px;
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .status-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 8px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 4px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 8px var(--green);
+      animation: pulse 1.8s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+
+    /* Main Container */
+    .tactical-container {
+      flex: 1;
+      padding: 14px;
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    @media (max-width: 860px) {
+      .tactical-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .tactical-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px;
+      position: relative;
+    }
+
+    .card-title {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--orange);
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Active Mission Banner */
+    .mission-alert {
+      grid-column: 1 / -1;
+      background: linear-gradient(90deg, rgba(239, 68, 68, 0.2) 0%, rgba(249, 115, 22, 0.1) 100%);
+      border: 1px solid var(--red);
+      border-left: 6px solid var(--red);
+      border-radius: 8px;
+      padding: 14px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .mission-headline {
+      font-size: 17px;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .mission-meta {
+      font-size: 12px;
+      color: #fca5a5;
+      font-family: 'JetBrains Mono', monospace;
+      margin-top: 4px;
+    }
+
+    .mission-badge {
+      background: var(--red);
+      color: white;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 4px;
+      letter-spacing: 1px;
+      display: inline-block;
+    }
+
+    /* Map Box */
+    #field-map {
+      height: 380px;
+      width: 100%;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: #000;
+    }
+
+    .route-instruction {
+      margin-top: 10px;
+      padding: 10px;
+      background: rgba(16, 185, 129, 0.1);
+      border-left: 4px solid var(--green);
+      border-radius: 4px;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Triage Section */
+    .triage-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .triage-box {
+      border-radius: 6px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .triage-red    { background: rgba(239, 68, 68, 0.15); border-color: var(--red); }
+    .triage-yellow { background: rgba(234, 179, 8, 0.15);  border-color: var(--yellow); }
+    .triage-green  { background: rgba(16, 185, 129, 0.15); border-color: var(--green); }
+    .triage-black  { background: rgba(107, 114, 128, 0.2); border-color: #6b7280; }
+
+    .triage-header {
+      font-size: 11px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .triage-controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 10px;
+    }
+
+    .triage-count {
+      font-size: 26px;
+      font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .btn-step {
+      width: 32px;
+      height: 32px;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 4px;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s;
+    }
+
+    .btn-step:hover { background: rgba(255,255,255,0.3); }
+
+    /* Quick Radio Buttons */
+    .radio-buttons {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .btn-radio {
+      background: #1f2937;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 12px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.15s;
+      text-align: left;
+    }
+
+    .btn-radio:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--orange);
+      transform: translateY(-1px);
+    }
+
+    .btn-radio.active {
+      background: var(--orange);
+      color: #000;
+      border-color: #ea580c;
+    }
+
+    /* Comms Feed */
+    .comms-stream {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 220px;
+      overflow-y: auto;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      padding-right: 4px;
+    }
+
+    .comm-msg {
+      padding: 8px 10px;
+      background: rgba(255,255,255,0.03);
+      border-left: 3px solid var(--orange);
+      border-radius: 0 4px 4px 0;
+    }
+
+    .comm-time { color: var(--text-muted); font-size: 10px; margin-right: 6px; }
+
+    /* Equipment Status */
+    .gear-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .gear-box {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px;
+      text-align: center;
+    }
+
+    .gear-val { font-size: 16px; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: var(--orange); }
+    .gear-lbl { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+
+    /* Bottom action bar */
+    .bottom-bar {
+      margin-top: 10px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-action-primary {
+      flex: 1;
+      background: var(--orange);
+      color: #000;
+      border: none;
+      padding: 12px;
+      border-radius: 6px;
+      font-weight: 800;
+      font-size: 13px;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-action-primary:hover {
+      background: #ea580c;
+    }
+
+    /* Floating Toast */
+    #tactical-toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #0f172a;
+      border: 1px solid var(--orange);
+      color: #fff;
+      padding: 12px 18px;
+      border-radius: 6px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.7);
+      font-size: 13px;
+      font-weight: 600;
+      display: none;
+      z-index: 9999;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Tactical Header -->
+  <header class="tactical-header">
+    <div class="unit-tag">
+      <span class="ndrf-badge">NDRF-04</span>
+      <div>
+        <div class="unit-title">TACTICAL FIELD TERMINAL</div>
+        <div class="unit-subtitle">DELTA RESCUE BATTALION // SECTOR 7</div>
+      </div>
+    </div>
+    <div class="tactical-status-strip">
+      <div class="status-pill">
+        <span class="status-dot"></span>
+        <span>EOC LINK: ACTIVE</span>
+      </div>
+      <div class="status-pill">
+        <span>📡 MESH: 915 MHz</span>
+      </div>
+      <div class="status-pill">
+        <span>🔋 BATT: 88%</span>
+      </div>
+      <div class="status-pill">
+        <a href="index.html" style="color: var(--orange); text-decoration: none; font-weight: 700;">🖥️ COMMAND CENTER</a>
+      </div>
+      <div class="status-pill">
+        <a href="citizen.html" style="color: #38bdf8; text-decoration: none; font-weight: 700;">📱 CITIZEN PORTAL</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="tactical-container">
+
+    <!-- Active Mission Order -->
+    <div class="mission-alert">
+      <div>
+        <div class="mission-badge">OPERATIONAL ORDER #NDRF-2026-B4</div>
+        <div class="mission-headline" style="margin-top: 6px;">Priority Mission: Coastal Flooding Search & Rescue — Besant Nagar</div>
+        <div class="mission-meta">
+          📍 Target: 12.9980° N, 80.2620° E &nbsp;|&nbsp; 👥 Est. Trapped: 14 Persons &nbsp;|&nbsp; ⚠️ Threat: Cyclone Storm Surge
+        </div>
+      </div>
+      <button class="btn-radio active" onclick="acknowledgeMission(this)" style="padding: 10px 16px;">
+        <span>✓</span> <span>MISSION ACKNOWLEDGED</span>
+      </button>
+    </div>
+
+    <!-- Map & Tactical Pathfinding -->
+    <div class="tactical-card">
+      <div class="card-title">
+        <span>📍 Tactical Field Route Navigation (A* Safe Bypass)</span>
+        <span style="color: var(--green);">GPS: 12.9810° N, 80.2190° E</span>
+      </div>
+      <div id="field-map"></div>
+      <div class="route-instruction">
+        <span style="font-size: 18px;">🛡️</span>
+        <div>
+          <strong>A* Navigation Directive:</strong> Maintain unflooded inland corridor via Velachery bypass. Avoid Marina coastal edge (4.5 km storm surge hazard).
+        </div>
+      </div>
+    </div>
+
+    <!-- START Rapid Field Triage -->
+    <div class="tactical-card">
+      <div class="card-title">
+        <span>📋 START Field Triage Counter</span>
+        <span style="font-size: 11px; color: var(--text-muted);">Syncs with Command SITREP</span>
+      </div>
+      
+      <div class="triage-grid">
+        <!-- Red -->
+        <div class="triage-box triage-red">
+          <div class="triage-header" style="color: var(--red);">🔴 IMMEDIATE (CRITICAL)</div>
+          <div class="triage-controls">
+            <button class="btn-step" onclick="changeCount('triage-red', -1)">-</button>
+            <div class="triage-count" id="triage-red" style="color: var(--red);">4</div>
+            <button class="btn-step" onclick="changeCount('triage-red', 1)">+</button>
+          </div>
+        </div>
+
+        <!-- Yellow -->
+        <div class="triage-box triage-yellow">
+          <div class="triage-header" style="color: var(--yellow);">🟡 DELAYED (SERIOUS)</div>
+          <div class="triage-controls">
+            <button class="btn-step" onclick="changeCount('triage-yellow', -1)">-</button>
+            <div class="triage-count" id="triage-yellow" style="color: var(--yellow);">6</div>
+            <button class="btn-step" onclick="changeCount('triage-yellow', 1)">+</button>
+          </div>
+        </div>
+
+        <!-- Green -->
+        <div class="triage-box triage-green">
+          <div class="triage-header" style="color: var(--green);">🟢 MINOR (WALKING)</div>
+          <div class="triage-controls">
+            <button class="btn-step" onclick="changeCount('triage-green', -1)">-</button>
+            <div class="triage-count" id="triage-green" style="color: var(--green);">11</div>
+            <button class="btn-step" onclick="changeCount('triage-green', 1)">+</button>
+          </div>
+        </div>
+
+        <!-- Black -->
+        <div class="triage-box triage-black">
+          <div class="triage-header" style="color: #9ca3af;">⚫ DECEASED</div>
+          <div class="triage-controls">
+            <button class="btn-step" onclick="changeCount('triage-black', -1)">-</button>
+            <div class="triage-count" id="triage-black" style="color: #9ca3af;">0</div>
+            <button class="btn-step" onclick="changeCount('triage-black', 1)">+</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="bottom-bar">
+        <button class="btn-action-primary" onclick="transmitTriageData()">
+          <span>📡</span> <span>TRANSMIT TRIAGE COUNTS TO EOC</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- One-Tap Radio Status Updates -->
+    <div class="tactical-card">
+      <div class="card-title">
+        <span>📻 1-Tap Field Status Radio</span>
+        <span style="font-size: 11px; color: var(--text-muted);">Instant Dispatch Telemetry</span>
+      </div>
+      <div class="radio-buttons">
+        <button class="btn-radio active" onclick="setStatus(this, 'EN ROUTE TO TARGET (ETA 6m)')">
+          <span>🚗</span> <span>EN ROUTE (ETA: 6M)</span>
+        </button>
+        <button class="btn-radio" onclick="setStatus(this, 'ON SCENE & BREACHING')">
+          <span>🚨</span> <span>ON SCENE & BREACHING</span>
+        </button>
+        <button class="btn-radio" onclick="setStatus(this, 'SURVIVORS EXTRACTED (4 SAVED)')">
+          <span>👥</span> <span>SURVIVORS EXTRACTED</span>
+        </button>
+        <button class="btn-radio" onclick="setStatus(this, 'REQ: HEAVY HYDRAULIC CUTTER')">
+          <span>✂️</span> <span>REQ: HYDRAULIC CUTTER</span>
+        </button>
+        <button class="btn-radio" onclick="setStatus(this, 'REQ: AIR MEDEVAC')">
+          <span>🚁</span> <span>REQ: AIR MEDEVAC</span>
+        </button>
+        <button class="btn-radio" onclick="setStatus(this, 'SECTOR CLEARED & SECURED')">
+          <span>🛡️</span> <span>SECTOR SECURED</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Field Comms & Equipment Inventory -->
+    <div class="tactical-card">
+      <div class="card-title">
+        <span>⚙️ Battalion Resource Inventory & Tactical Comms</span>
+      </div>
+
+      <div class="gear-grid">
+        <div class="gear-box">
+          <div class="gear-val">02</div>
+          <div class="gear-lbl">Inflatable Boats</div>
+        </div>
+        <div class="gear-box">
+          <div class="gear-val">12/15</div>
+          <div class="gear-lbl">Oxygen Tanks</div>
+        </div>
+        <div class="gear-box">
+          <div class="gear-val">94%</div>
+          <div class="gear-lbl">Drone Battery</div>
+        </div>
+      </div>
+
+      <div style="margin-top: 12px; margin-bottom: 6px; font-size: 11px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace;">
+        SECURE BATTALION COMMS STREAM:
+      </div>
+      <div class="comms-stream" id="tactical-comms">
+        <div class="comm-msg"><span class="comm-time">10:12:04</span><strong>COMMAND:</strong> Delta Unit, road NH-7 blocked by uprooted banyan. Use Inner Ring bypass.</div>
+        <div class="comm-msg"><span class="comm-time">10:14:22</span><strong>ALPHA-1:</strong> On scene at T Nagar. Setting up field triage point at Community Hall.</div>
+        <div class="comm-msg"><span class="comm-time">10:18:10</span><strong>DELTA-4:</strong> Acknowledged. Proceeding via Velachery with 2 motorized zodiac boats.</div>
+      </div>
+    </div>
+
+  </main>
+
+  <div id="tactical-toast"></div>
+
+  <script>
+    // Initialize Tactical Leaflet Map
+    const map = L.map('field-map', { zoomControl: true }).setView([13.005, 80.245], 13);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      maxZoom: 19,
+      attribution: '© OpenStreetMap contributors, CartoDB'
+    }).addTo(map);
+
+    // NDRF Unit Position (Velachery Base)
+    const unitPos = [12.981, 80.219];
+    const unitMarker = L.circleMarker(unitPos, {
+      radius: 9,
+      fillColor: '#38bdf8',
+      color: '#fff',
+      weight: 2,
+      opacity: 1,
+      fillOpacity: 0.9
+    }).addTo(map).bindPopup('<strong>DELTA BATTALION (YOU)</strong><br>Status: En Route<br>Speed: 42 km/h').openPopup();
+
+    // Mission Incident Target (Besant Nagar)
+    const targetPos = [12.998, 80.262];
+    const targetMarker = L.circleMarker(targetPos, {
+      radius: 11,
+      fillColor: '#ef4444',
+      color: '#fee2e2',
+      weight: 3,
+      opacity: 1,
+      fillOpacity: 0.9
+    }).addTo(map).bindPopup('<strong>MISSION TARGET: BESANT NAGAR</strong><br>Flooding & Structural Collapse<br>Trapped: 14 civilians');
+
+    // Hazard Area (Storm Surge coast)
+    const surgePolygon = L.polygon([
+      [13.048, 80.272],
+      [13.010, 80.268],
+      [12.990, 80.265],
+      [12.995, 80.278],
+      [13.052, 80.282]
+    ], {
+      color: '#f43f5e',
+      fillColor: '#f43f5e',
+      fillOpacity: 0.25,
+      weight: 2,
+      dashArray: '4, 4'
+    }).addTo(map).bindPopup('<strong>STORM SURGE HAZARD ZONE</strong><br>Do not cross — Water level +3.2m');
+
+    // A* Safe Evacuation Corridor Line (Green)
+    const safeRoute = [
+      unitPos,
+      [12.985, 80.228],
+      [12.992, 80.241],
+      [12.995, 80.252],
+      targetPos
+    ];
+    L.polyline(safeRoute, {
+      color: '#10b981',
+      weight: 5,
+      opacity: 0.9,
+      dashArray: '8, 8'
+    }).addTo(map).bindPopup('<strong>A* SAFE CORRIDOR</strong><br>Cleared of debris & unflooded');
+
+    // Triage Counter Handler
+    function changeCount(id, delta) {
+      const el = document.getElementById(id);
+      let val = parseInt(el.textContent, 10) + delta;
+      if (val < 0) val = 0;
+      el.textContent = val;
+    }
+
+    function transmitTriageData() {
+      const red = document.getElementById('triage-red').textContent;
+      const yellow = document.getElementById('triage-yellow').textContent;
+      const green = document.getElementById('triage-green').textContent;
+      const black = document.getElementById('triage-black').textContent;
+
+      // Broadcast to platform state via localStorage
+      const payload = {
+        sender: 'NDRF-DELTA-BATTALION',
+        timestamp: Date.now(),
+        triage: { red: Number(red), yellow: Number(yellow), green: Number(green), black: Number(black) }
+      };
+      localStorage.setItem('NDRF_FIELD_TRIAGE_LATEST', JSON.stringify(payload));
+
+      showToast(`✓ TRIAGE DATA TRANSMITTED TO EOC (${red} Critical, ${yellow} Serious, ${green} Minor)`);
+
+      // Add to comms
+      addCommMessage(`TRIAGE TRANSMITTED: ${red} Critical (Red), ${yellow} Serious, ${green} Walking wounded.`);
+    }
+
+    function setStatus(btn, statusText) {
+      document.querySelectorAll('.btn-radio').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      showToast(`📻 RADIO PING: "${statusText}"`);
+      addCommMessage(`STATUS UPDATE: Delta-4 is ${statusText}.`);
+    }
+
+    function acknowledgeMission(btn) {
+      btn.style.background = '#10b981';
+      btn.innerHTML = '<span>✓</span> <span>MISSION IN PROGRESS</span>';
+      showToast('✓ MISSION ACKNOWLEDGED. Dispatch confirmed with National Command.');
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('tactical-toast');
+      toast.textContent = msg;
+      toast.style.display = 'block';
+      setTimeout(() => { toast.style.display = 'none'; }, 3500);
+    }
+
+    function addCommMessage(text) {
+      const comms = document.getElementById('tactical-comms');
+      const now = new Date().toTimeString().split(' ')[0];
+      const div = document.createElement('div');
+      div.className = 'comm-msg';
+      div.innerHTML = `<span class="comm-time">${now}</span><strong>DELTA-4:</strong> ${text}`;
+      comms.prepend(div);
+    }
+  </script>
+</body>
+</html>
