@@ -327,11 +327,7 @@ window.DP.MapManager = class {
     if (!this.map) return;
     this._lastData = data; // Store data for toggling layers
 
-    if (window.DP.App && window.DP.App.mapScope === 'all') {
-      const allIncidents = window.DP.App.getAllIncidentsAcrossAllScenarios();
-      this.renderAllDisasterZones(allIncidents);
-      return;
-    }
+
 
     const { incidents, resources, scenario, ai } = data;
 

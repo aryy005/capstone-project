@@ -26,7 +26,7 @@ class Application {
     this.compareManager = new window.DP.CompareManager();
     this.currentView      = 'landing';
     this.selectedScenario = window.DP.Scenarios.HURRICANE;
-    this.mapScope         = 'all';
+    this.mapScope         = 'scenario';
   }
 
   init() {
