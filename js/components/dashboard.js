@@ -231,7 +231,8 @@ window.DP.DashboardComponent = class {
       window.DP.Helpers.animateCounter(this.elements.activeIncidents, parseInt(this.elements.activeIncidents.textContent) || 0, stats.active);
     }
     if (this.elements.affectedPop) {
-      window.DP.Helpers.animateCounter(this.elements.affectedPop, parseInt(this.elements.affectedPop.textContent.replace(/,/g,'')) || 0, stats.totalPop);
+      const raw = (this.elements.affectedPop.textContent || '0').replace(/,/g, '');
+      window.DP.Helpers.animateCounter(this.elements.affectedPop, parseInt(raw, 10) || 0, stats.totalPop);
     }
     if (this.elements.deployedRes) {
       window.DP.Helpers.animateCounter(this.elements.deployedRes, parseInt(this.elements.deployedRes.textContent) || 0, stats.deployed);

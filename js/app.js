@@ -58,20 +58,20 @@ class Application {
     this.alerts.requestPushPermission();
 
     // Listen for real-time events from NDRF Field Terminal and Citizen Safety Portal
-    window.addEventListener("storage", (e) => {
-      if (e.key === "CITIZEN_SOS_DISPATCHES" && e.newValue) {
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'CITIZEN_SOS_DISPATCHES' && e.newValue) {
         try {
           const list = JSON.parse(e.newValue);
           const latest = list[0];
           if (latest && this.alerts) {
-            this.alerts.toast("critical", "🚨 Citizen SOS Beacon Received", Ticket #:  civilians in distress (). Auto-routed to NDRF.);
+            this.alerts.toast('critical', '🚨 Citizen SOS Beacon Received', 'Ticket #' + latest.id + ': ' + latest.count + ' civilians in distress (' + (latest.type || 'Emergency') + '). Auto-routed to NDRF.');
           }
         } catch (_) {}
-      } else if (e.key === "NDRF_FIELD_TRIAGE_LATEST" && e.newValue) {
+      } else if (e.key === 'NDRF_FIELD_TRIAGE_LATEST' && e.newValue) {
         try {
           const data = JSON.parse(e.newValue);
           if (data && this.alerts) {
-            this.alerts.toast("info", "📡 Field Triage Sync (NDRF)", ${data.sender}:  Critical,  Delayed,  Minor walking wounded.);
+            this.alerts.toast('info', '📡 Field Triage Sync (NDRF)', data.sender + ': ' + data.triage.red + ' Critical, ' + data.triage.yellow + ' Delayed, ' + data.triage.green + ' Minor walking wounded.');
           }
         } catch (_) {}
       }
